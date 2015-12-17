@@ -57,6 +57,24 @@ app.post('/slack', function(req,res) {
 });
 
 
+app.get("/doc", function(req,res) {
+  
+  // see which document is to be edited
+  var id = req.query.id;
+  if (!id) {
+    return res.status(404).send("Invalid id");
+  }
+  
+  events.load(id, function(err, data) {
+    if (err) {
+      return res.status(404).send("Missing or unknown id");
+    }
+    
+    res.send(data);
+    
+  })
+});
+
 // set up the database
 cloudant.db.create(config.DBNAME, function(e, d) {
   
