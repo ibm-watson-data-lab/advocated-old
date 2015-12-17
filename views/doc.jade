@@ -1,0 +1,49 @@
+doctype html
+html(lang="en")
+head
+  include head.jade
+body
+
+  div.container
+    div.header
+     h1 Edit document #{doc._id}
+
+    div#attendedorpresented.jumbotron
+      p.btn.btn-primary.btn-lg(href="Javascript:selectAttended()",role="button") I attended an event
+      p.btn.btn-warning.btn-lg(href="Javascript:selectAttended()",role="button") I presented at an event
+      
+      
+    form(id="session")
+      h2 Session
+      input(type="hidden",name="collection",value="session")
+      
+      div.form-group
+        label(for="sessionevent") Event
+        select#sessionevent.form-control(name="event")
+          option
+          option 1
+          option 2
+
+      
+      div.form-group
+        label(for="sessiontitle") Title
+        input#sessiontitle.form-control(name="title",type="text",placeholder="Session Title",value="#{doc.title}")
+      
+      div.form-group
+        label(for="sessionstart") Date
+        input#sessionstart.form-control(name="dtstart",type="text",placeholder="YYYY-MM-DD",value="#{doc.dtstart}")
+      
+      div.form-group
+        label(for="sessiondescription") Description
+        input#sessiondescription.form-control(name="description",type="text",,value="#{doc.description}")
+        
+       div.form-group
+         label(for="sessionattendees") Attendees
+         input#sessionattendees.form-control(name="attendees",type="text",,value="#{doc.attendees}")
+        
+       button.btn.btn-default(type="submit") Submit
+    
+    script(type="text/javascript").
+      $( document ).ready(function() {
+      });
+
