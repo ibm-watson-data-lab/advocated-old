@@ -9,7 +9,13 @@ var express = require('express'),
   events = require('./lib/events.js'),
   app = express(),
   appEnv = cfenv.getAppEnv(),
+  session = require('express-session'),
   appurl = (appEnv.app.application_uris)?appEnv.app.application_uris[0]:"localhost:"+appEnv.port;
+
+// initialise session support
+app.use(session({
+  secret: appurl, cookie: { }
+}));
 
 // body parsing
 var bodyParser = require('body-parser');
@@ -64,15 +70,15 @@ app.post('/slack', function(req,res) {
 // authenticate
 app.get("/auth/:id", function(req,res) {
   
-  // see which document is to be edited
+  // extract the token
   var id = req.params.id;
   if (!id) {
-    return res.status(404).send("Invalid id");
+    return res.status(403).send("Invalid token");
   }
   
   tokens.load(id, function(err, data) {
     if (err) {
-      return res.status(404).send("Missing or unknown id");
+      return res.status(403).send("Missing or unknown token");
     }
     
     // kill the token - single use only
@@ -81,13 +87,19 @@ app.get("/auth/:id", function(req,res) {
     });
     
     // extract the user object from the token
-    var user = data.user;
-    
-    res.render("doc", {doc: { title: data.title}, user: user, });
-//    res.send(data);
-    
+    req.session.user = data.user;
+    req.session.title = data.title
+    res.redirect("/menu");
+   
   })
 });
+
+app.get("/menu", function(req,res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  res.render("doc", { doc: { title: req.session.title || "" }})
+})
 
 // set up the databases
 cloudant.db.create(config.TOKEN_DBNAME, function(e,d) {
