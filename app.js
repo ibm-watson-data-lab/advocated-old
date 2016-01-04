@@ -101,7 +101,11 @@ app.post("/doc", function(req,res) {
   doc.sponsored = (doc.sponsored)?true:false;
   doc.tags = doc.tags.split(",");
   doc.attendees = parseInt(doc.attendees);
-  doc.attendee = req.session.user._id;
+  if(doc.collection == "session") {
+    doc.attendee = req.session.user._id;    
+  } else {
+    doc.presenter = req.session.user._id;
+  }
   events.save(doc, function(err, data) {
     console.log("err,data",err, data);
     if (err) {
@@ -119,9 +123,7 @@ app.get("/events", function(req, res) {
   events.list(function(err,data) {
     console.log(err,data);
     res.send(data);
-  })
-  
-  
+  });
 })
 
 // set up the databases

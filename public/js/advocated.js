@@ -14,6 +14,19 @@ var selectPresented = function() {
   $('#attendedorpresented').hide();
   $('#attended').hide();
   $('#presented').show();
+  var req = {
+    url: "/events",
+    method: "get",
+    dataType: "json"
+  };
+  $.ajax(req).done(function(msg) {
+    console.log(msg);
+    var html = "";
+    for (var i in msg.rows) {
+      html += '<option value="' + msg.rows[i].id + '">' + msg.rows[i].value + '</option>\n';
+    }
+    $('#sessionevent').html(html);
+  });
 }
 
 var selectAttended = function() {
@@ -45,31 +58,38 @@ var renderMessage = function(str) {
   $('#message').html(html);
 }
 
+var submitForm = function(data) {
+  var req = {
+    url: "doc",
+    method: "post",
+    data: data,
+    dataType: "json"
+  };
+  $.ajax(req).done(function(msg) {
+    renderMessage(msg);
+    hideForms();
+    clearForms();
+  }).fail(function(msg) {
+    renderError(msg);
+  });
+}
+
 var init = function() {
   hideForms();
 
   $('#presented' ).on( "submit", function( event ) {
     event.preventDefault();
-    console.log( $( this ).serialize() );
+    submitForm($( this ).serialize());
   });
 
   $('#attended').on( "submit", function( event ) {
     event.preventDefault();
-    
-    var req = {
-      url: "doc",
-      method: "post",
-      data: $( this ).serialize(),
-      dataType: "json"
-    };
-    $.ajax(req).done(function(msg) {
-      renderMessage(msg);
-      hideForms();
-      clearForms();
-    }).fail(function(msg) {
-      renderError(msg);
-    });
+    submitForm($( this ).serialize());
   });
 }
 
+
+$( document ).ready(function() {
+  init();
+});
 

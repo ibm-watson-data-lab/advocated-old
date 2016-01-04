@@ -79,10 +79,6 @@ body
       div.form-group
         label(for="sessionevent") Event
         select#sessionevent.form-control(name="event")
-          option
-          option 1
-          option 2
-
       
       div.form-group
         label(for="sessiontitle") Title
@@ -90,21 +86,43 @@ body
       
       div.form-group
         label(for="sessionstart") Date
-        input#sessionstart.form-control(name="dtstart",type="text",placeholder="YYYY-MM-DD",value="#{doc.dtstart}")
+        input#sessionstart.form-control(name="dtstart",type="text",placeholder="YYYY-MM-DD")
       
       div.form-group
         label(for="sessiondescription") Description
-        input#sessiondescription.form-control(name="description",type="text",,value="#{doc.description}")
+        input#sessiondescription.form-control(name="description",type="text")
         
        div.form-group
          label(for="sessionattendees") Attendees
-         input#sessionattendees.form-control(name="attendees",type="text",,value="#{doc.attendees}")
+         input#sessionattendees.form-control(name="attendees",type="text")
 
+       div.form-group
+         h3 Categories
+         div.checkbox
+           label
+           input(name="categories",type="checkbox",value="Conference")
+           | Conference
+         div.checkbox
+           label
+           input(name="categories",type="checkbox",value="Meetup")
+           | Meetup 
+         div.checkbox
+           label
+           input(name="categories",type="checkbox",value="Hackathon")
+           | Hackathon
+         div.checkbox
+           label
+           input(name="categories",type="checkbox",value="Webinar")
+           | Webinar
+
+       div.form-group
+         label(for="sessiontags") Tags
+         input#sessiontags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo")
+
+       div.form-group
+         label(for="sessioncomments") Comments
+         input#sessioncomments.form-control(name="comments",type="text")
+       
        button.btn.btn-default(type="submit") Submit
-    
-    
-    script(type="text/javascript").
-      $( document ).ready(function() {
-        init();
-      });
+
 
