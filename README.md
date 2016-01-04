@@ -41,4 +41,13 @@ Click on each button reveals a form.
 
 ## POST /doc
 
-To be done
+Only accessible to logged-in users. 
+
+The posted form elements are saved as a new event document.
+
+
+## GET /events
+
+Only accessible to logged-in users. 
+
+Get a list of events. 

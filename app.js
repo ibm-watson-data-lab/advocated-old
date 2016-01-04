@@ -32,6 +32,9 @@ var ddoc = { _id: "_design/find",
              views: {
                 userbyidentifier: {
                   map: "function (doc) {\n if(doc.collection=='user') { for(var i in doc.identifiers) { emit([i, doc.identifiers[i].user_id ], null);}}\n}"
+                },
+                eventslist: {
+                  map: "function (doc) {\n if(doc.collection=='event') { emit(doc.dtstart, doc.title); }}"
                 }
               }};
 
@@ -90,6 +93,10 @@ app.get("/menu", function(req,res) {
 
 // create a new event
 app.post("/doc", function(req,res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  
   var doc = req.body;
   doc.sponsored = (doc.sponsored)?true:false;
   doc.tags = doc.tags.split(",");
@@ -103,6 +110,18 @@ app.post("/doc", function(req,res) {
       res.status(200).send( data );
     }
   });
+});
+
+app.get("/events", function(req, res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  events.list(function(err,data) {
+    console.log(err,data);
+    res.send(data);
+  })
+  
+  
 })
 
 // set up the databases
