@@ -6,15 +6,74 @@ body
 
   div.container
     div.header
-     h1 Edit document #{doc._id}
-
+    
+    div#error
+    div#message
+                      
     div#attendedorpresented.jumbotron
-      p.btn.btn-primary.btn-lg(href="Javascript:selectAttended()",role="button") I attended an event
-      p.btn.btn-warning.btn-lg(href="Javascript:selectAttended()",role="button") I presented at an event
+      a.btn.btn-primary.btn-lg(href="Javascript:selectAttended()",role="button") I attended an event
+      &nbsp;
+      a.btn.btn-warning.btn-lg(href="Javascript:selectPresented()",role="button") I presented at an event
       
+    form(id="attended")
+      h2 Attended an Event
+      input(type="hidden",name="collection",value="event")
+
+      div.form-group
+        label(for="eventtitle") Title
+        input#eventtitle.form-control(name="title",type="text",placeholder="Session Title",value="#{doc.title}")
+
+      div.form-group
+        label(for="eventstart") Date Start
+        input#eventstart.form-control(name="dtstart",type="text",placeholder="YYYY-MM-DD")
+
+      div.form-group
+        label(for="eventend") Date End
+        input#eventend.form-control(name="dtend",type="text",placeholder="YYYY-MM-DD")
+
+      div.form-group
+        label(for="eventdescription") Description
+        input#eventdescription.form-control(name="description",type="text")
+ 
+      div.form-group
+        label(for="eventattendees") Attendees
+        input#eventattendees.form-control(name="attendees",type="text",placeholder="the number of attendees at the event")
+
+       div.form-group
+         h3 Categories
+         div.checkbox
+           label
+           input(name="categories",type="checkbox",value="Conference")
+           | Conference
+         div.checkbox
+           label
+           input(name="categories",type="checkbox",value="Meetup")
+           | Meetup 
+         div.checkbox
+           label
+           input(name="categories",type="checkbox",value="Hackathon")
+           | Hackathon
+                      
+      div.form-group
+        h3 IBM Sponsored
+        div.checkbox
+          label
+          input(name="sponsored",type="checkbox",value="Sponsored")
+          | Yes
+
+      div.form-group
+        label(for="eventtags") Tags
+        input#eventtags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo")
+  
+      div.form-group
+        label(for="eventcomments") Comments
+        input#eventcomments.form-control(name="comments",type="text")
+                  
+                  
+      button.btn.btn-default(type="submit") Submit
       
-    form(id="session")
-      h2 Session
+    form(id="presented")
+      h2 Presented at an event
       input(type="hidden",name="collection",value="session")
       
       div.form-group
@@ -40,10 +99,12 @@ body
        div.form-group
          label(for="sessionattendees") Attendees
          input#sessionattendees.form-control(name="attendees",type="text",,value="#{doc.attendees}")
-        
+
        button.btn.btn-default(type="submit") Submit
+    
     
     script(type="text/javascript").
       $( document ).ready(function() {
+        init();
       });
 

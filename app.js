@@ -40,20 +40,6 @@ app.post('/slack', function(req,res) {
   
   // ensure that the incoming request has the correct token
   if (req.body.token && req.body.token == process.env.SLACK_TOKEN) {
-    var obj = { 
-                collection: 'provisional',
-                attendee: null,
-                title: req.body.text || '',
-                dstart: moment().format('YYYY-MM-DD'),
-                dend: moment().format('YYYY-MM-DD'),
-                description: '',   
-                attendees: 0,
-                categories:[],
-                sponsored: false,
-                tags: [],
-                comments: ''   
-              };
-    
     
     users.getOrSave('slack', req.body.user_name, req.body, function(err, data) {
       tokens.save({user: data, title: req.body.text}, function(err, data) {
@@ -99,6 +85,24 @@ app.get("/menu", function(req,res) {
     return res.status(403).send("Not logged in");
   }
   res.render("doc", { doc: { title: req.session.title || "" }})
+});
+
+
+// create a new event
+app.post("/doc", function(req,res) {
+  var doc = req.body;
+  doc.sponsored = (doc.sponsored)?true:false;
+  doc.tags = doc.tags.split(",");
+  doc.attendees = parseInt(doc.attendees);
+  doc.attendee = req.session.user._id;
+  events.save(doc, function(err, data) {
+    console.log("err,data",err, data);
+    if (err) {
+      res.status(400).send( {ok: false, error: err.message});
+    } else {
+      res.status(200).send( data );
+    }
+  });
 })
 
 // set up the databases

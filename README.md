@@ -25,7 +25,19 @@ When the user visits the URL, the token document is retrieved which gives the ap
 * the user document
 * the provisional title of the event
 
-This is passed to a Jade form for rendering. The token document is then destroyed (it is a one-time token).
+The above items are stored in session and then the page is bounced to `/menu`.
+
+
+## GET /menu
+
+Only accessible to logged-in users. 
+
+Renders a form with two options
+
+* I attended an event
+* I presented an event
+
+Click on each button reveals a form.
 
 ## POST /doc
 
