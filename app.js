@@ -46,7 +46,7 @@ app.post('/slack', function(req,res) {
     
     users.getOrSave('slack', req.body.user_name, req.body, function(err, data) {
       tokens.save({user: data, title: req.body.text}, function(err, data) {
-        res.send("Thanks for advocating. Please visit this URL to enter the details https://" + appurl  + "/auth/"+data.id);
+        res.send("Thanks for advocating. Please visit this URL to enter the details <https://" + appurl  + "/auth/"+data.id+">");
       })
 
     });
