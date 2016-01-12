@@ -33,7 +33,7 @@ body
 
       div.form-group
         label(for="eventdescription") Description
-        textarea.form-control(name="description")
+        textarea#eventdescription.form-control(name="description")
  
       div.form-group
         label(for="eventattendees") Attendees
@@ -67,8 +67,7 @@ body
   
       div.form-group
         label(for="eventcomments") Comments
-        input#eventcomments.form-control(name="comments",type="text")
-                  
+        textarea#eventcomments.form-control(name="comments")                  
                   
       button.btn.btn-default(type="submit") Submit
       
