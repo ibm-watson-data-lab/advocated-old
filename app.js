@@ -34,7 +34,7 @@ var ddoc = { _id: "_design/find",
                   map: "function (doc) {\n if(doc.collection=='user') { for(var i in doc.identifiers) { emit([i, doc.identifiers[i].user_id ], null);}}\n}"
                 },
                 eventslist: {
-                  map: "function (doc) {\n if(doc.collection=='event') { emit(doc.dtstart, doc.title); }}"
+                  map: "function (doc) {\n if(doc.collection=='event' && doc.attendee) { emit([doc.attendee,doc.dtstart], doc.title); }}"
                 }
               }};
 
@@ -102,9 +102,9 @@ app.post("/doc", function(req,res) {
   doc.tags = doc.tags.split(",");
   doc.attendees = parseInt(doc.attendees);
   if(doc.collection == "session") {
-    doc.attendee = req.session.user._id;    
-  } else {
     doc.presenter = req.session.user._id;
+  } else {
+    doc.attendee = req.session.user._id;    
   }
   events.save(doc, function(err, data) {
     console.log("err,data",err, data);
@@ -120,7 +120,7 @@ app.get("/events", function(req, res) {
   if (!req.session.user) {
     return res.status(403).send("Not logged in");
   }
-  events.list(function(err,data) {
+  events.list(req.session.user._id, function(err,data) {
     console.log(err,data);
     res.send(data);
   });
