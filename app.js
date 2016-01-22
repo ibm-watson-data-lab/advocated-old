@@ -35,6 +35,9 @@ var ddoc = { _id: "_design/find",
                 },
                 eventslist: {
                   map: "function (doc) {\n if(doc.collection=='event' && doc.attendee) { emit([doc.attendee,doc.dtstart], doc.title); }}"
+                },
+                mystuff: {
+                  map: "function(doc) {\n if(doc.collection!='user') { var attendee=(doc.collection=='session')?doc.presenter:doc.attendee; emit([attendee,doc.dtstart], [doc.title, doc.collection] ); }}"
                 }
               }};
 
@@ -87,9 +90,24 @@ app.get("/menu", function(req,res) {
   if (!req.session.user) {
     return res.status(403).send("Not logged in");
   }
-  res.render("doc", { doc: { title: req.session.title || "" }})
+  events.mystuff(req.session.user._id, function(err, data) {
+    res.render("doc", { doc: { title: req.session.title || "" }, docs: data.rows})
+  });
 });
 
+app.get("/attended", function(req,res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  res.render("attended", { doc: { title: req.session.title || "" } });
+});
+
+app.get("/presented", function(req,res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  res.render("presented", { doc: { title: req.session.title || "" } });
+});
 
 // create a new event
 app.post("/doc", function(req,res) {

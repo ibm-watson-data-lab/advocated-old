@@ -1,19 +1,8 @@
 var clearForms = function() {
-  $('#presented').trigger("reset");
-  $('#attended').trigger("reset");
+  $('form').trigger("reset");
 };
 
-var hideForms = function() {
-  $('#attendedorpresented').show();
-  $('#presented').hide();
-  $('#attended').hide();
-};
-
-var selectPresented = function() {
-  console.log("Presented");
-  $('#attendedorpresented').hide();
-  $('#attended').hide();
-  $('#presented').show();
+var prefillPresented = function() {
   var req = {
     url: "/events",
     method: "get",
@@ -27,14 +16,7 @@ var selectPresented = function() {
     }
     $('#sessionevent').html(html);
   });
-}
-
-var selectAttended = function() {
-  console.log("Attended");
-  $('#attendedorpresented').hide();
-  $('#presented').hide();
-  $('#attended').show();
-}
+};
 
 var renderError = function(str) {
   $('#message').html("");
@@ -45,7 +27,7 @@ var renderError = function(str) {
   html += JSON.stringify(str);
   html += '</div>'
   $('#error').html(html);
-}
+};
 
 var renderMessage = function(str) {
   $('#error').html("");
@@ -54,9 +36,10 @@ var renderMessage = function(str) {
   html += '<span aria-hidden="true">&times;</span>'
   html += '</button>';
   html += JSON.stringify(str);
+  html += '<div><a href="menu">MENU</a></div>'
   html += '</div>'
   $('#message').html(html);
-}
+};
 
 var submitForm = function(data) {
   var req = {
@@ -66,30 +49,13 @@ var submitForm = function(data) {
     dataType: "json"
   };
   $.ajax(req).done(function(msg) {
+    console.log(msg);
     renderMessage(msg);
-    hideForms();
     clearForms();
   }).fail(function(msg) {
+    console.log("fail",msg);
     renderError(msg);
   });
-}
+};
 
-var init = function() {
-  hideForms();
-
-  $('#presented' ).on( "submit", function( event ) {
-    event.preventDefault();
-    submitForm($( this ).serialize());
-  });
-
-  $('#attended').on( "submit", function( event ) {
-    event.preventDefault();
-    submitForm($( this ).serialize());
-  });
-}
-
-
-$( document ).ready(function() {
-  init();
-});
 
