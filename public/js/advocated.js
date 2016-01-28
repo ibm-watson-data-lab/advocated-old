@@ -11,6 +11,7 @@ var prefillPresented = function() {
   $.ajax(req).done(function(msg) {
     console.log(msg);
     var html = "";
+    html += '<option value="">-- choose an event --</option>\n';
     for (var i in msg.rows) {
       html += '<option value="' + msg.rows[i].id + '">' + msg.rows[i].value + '</option>\n';
     }
