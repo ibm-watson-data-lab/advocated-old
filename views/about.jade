@@ -1,0 +1,43 @@
+doctype html
+html(lang="en")
+head
+  include head.jade
+body.capped-layout
+  header.capped-layout_cap.app-banner
+    span.app-banner_title IBM Cloud Data Services // Dev
+    
+  div.capped-layout_body.bookend-layout
+    nav.bookend-layout_bookend.theme_light.bg_white
+      include nav.jade
+      
+    div.bookend-layout_body.theme_dark
+      section.layout_section
+        h1.type_heading
+          mark.type_mark Welcome to the Simple Advocated Service
+          
+        hr
+        
+        p.type_copy A simple Node.js App that records CDS Developer Advocate activity in a Cloudant database.
+        
+        p.type_copy It:
+        
+        ul.list_unordered.about_list
+          li Responds to 
+            span.type_mark POST /slack 
+            commands which create entries in the tokens database
+          li Responds to 
+            span.type_mark GET /auth/:id 
+            commands which redeem tokens
+          li Responds to 
+            span.type_mark POST /doc API 
+            commands which creates an entry into the database
+          li 
+            span.type_mark GET /menu 
+            which renders the single-page web app
+          li 
+            span.type_mark GET /events 
+            which returns the list of events in newest-first order
+           
+        p.type_copy Visit the 
+          a.type_link(href="https://github.com/ibm-cds-labs/advocated",target="_blank") Simple Advocated Service
+          &nbsp;GitHub repository for more information.

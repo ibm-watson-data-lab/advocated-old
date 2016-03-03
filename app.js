@@ -86,6 +86,13 @@ app.get("/auth/:id", function(req,res) {
   })
 });
 
+app.get("/about", function(req,res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  res.render("about", { doc: { title: req.session.title || "" } });
+});
+
 app.get("/menu", function(req,res) {
   if (!req.session.user) {
     return res.status(403).send("Not logged in");

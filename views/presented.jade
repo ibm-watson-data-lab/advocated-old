@@ -2,79 +2,91 @@ doctype html
 html(lang="en")
 head
   include head.jade
-body
-
-  div.container
-    div.header
-                              
-    form(id="presented")
-      h2 Presented at an event
-      input(type="hidden",name="collection",value="session")
+body.capped-layout
+  header.capped-layout_cap.app-banner
+    span.app-banner_title IBM Cloud Data Services // Dev
+    
+  div.capped-layout_body.bookend-layout
+    nav.bookend-layout_bookend.theme_light.bg_white
+      include nav.jade
       
-      div.form-group
-        label(for="sessionevent") Event
-        select#sessionevent.form-control(name="event")
+    div.bookend-layout_body.theme_dark
+      //-section.layout_section.theme_light
+        //-h1.type_heading
+          //-mark.type_mark Presented at an Event
       
-      div.form-group
-        label(for="sessiontitle") Title
-        input#sessiontitle.form-control(name="title",type="text",placeholder="Session Title",value="#{doc.title}")
+      section.layout_section  
+        h1.type_heading
+          mark.type_mark Presented at an Event
+          
+        form(id="presented")
+          div.form_standard
+            input(type="hidden",name="collection",value="session")
       
-      div.form-group
-        label(for="sessionstart") Date
-        input#sessionstart.form-control(name="dtstart",type="date",placeholder="YYYY-MM-DD")
+            div.form_field
+              label.form_label(for="sessionevent") Event
+              select.input_select.input_wide#sessionevent.form-control(name="event")
       
-      div.form-group
-        label(for="sessiondescription") Description
-        textarea#sessiondescription.form-control(name="description")
+            div.form_field
+              label.form_label(for="sessiontitle") Title
+              input.input_text.input_wide#sessiontitle.form-control(name="title",type="text",placeholder="Session Title",value="#{doc.title}")
+      
+            div.form_field
+              label.form_label(for="sessionstart") Date
+              input.input_text.input_wide#sessionstart.form-control(name="dtstart",type="date",placeholder="YYYY-MM-DD")
+      
+            div.form_field
+              label.form_label(for="sessiondescription") Description
+              textarea.input_textarea.input_wide#sessiondescription.form-control(name="description")
         
-       div.form-group
-         label(for="sessionattendees") Attendees
-         input#sessionattendees.form-control(name="attendees",type="number",placeholder="Approximate number of attendees")
+            div.form_field
+              label.form_label(for="sessionattendees") Attendees
+              input.input_text.input_wide#sessionattendees.form-control(name="attendees",type="number",placeholder="Approximate number of attendees")
 
-       div.form-group
-         h3 IBM Sponsored
-         div.checkbox
-           label
-           input(name="sponsored",type="checkbox",value="Sponsored")
-           | Yes
+            div.form_field
+              h3 IBM Sponsored
+              div.checkbox
+                label
+                input(name="sponsored",type="checkbox",value="Sponsored")
+                | Yes
 
-       div.form-group
-         h3 Categories
-         div.checkbox
-           label
-           input(name="categories",type="checkbox",value="Conference")
-           | Conference
-         div.checkbox
-           label
-           input(name="categories",type="checkbox",value="Meetup")
-           | Meetup 
-         div.checkbox
-           label
-           input(name="categories",type="checkbox",value="Hackathon")
-           | Hackathon
-         div.checkbox
-           label
-           input(name="categories",type="checkbox",value="Webinar")
-           | Webinar
+            div.form_field
+              h3 Categories
+              div.checkbox
+                label
+                input(name="categories",type="checkbox",value="Conference")
+                | Conference
+              div.checkbox
+                label
+                input(name="categories",type="checkbox",value="Meetup")
+                | Meetup 
+              div.checkbox
+                label
+                input(name="categories",type="checkbox",value="Hackathon")
+                | Hackathon
+              div.checkbox
+                label
+                input(name="categories",type="checkbox",value="Webinar")
+                | Webinar
 
-       div.form-group
-         label(for="sessiontags") Tags
-         input#sessiontags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo")
+            div.form_field
+              label.form_label(for="sessiontags") Tags
+              input.input_text.input_wide#sessiontags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo")
 
-       div.form-group
-         label(for="sessioncomments") Comments
-         input#sessioncomments.form-control(name="comments",type="text")
+            div.form_field
+              label.form_label(for="sessioncomments") Comments
+              input.input_text.input_wide#sessioncomments.form-control(name="comments",type="text")
        
-      div#error
-      div#message   
+            div#error
+            div#message   
        
-      button.btn.btn-default(type="submit") Submit
+            button.button_primary(type="submit") Submit
 
-      script.
-       $( document ).ready(function() {
-         $('#presented' ).on( "submit", function( event ) {
-           event.preventDefault();
-           submitForm($( this ).serialize());
-         });
-         prefillPresented();
-       });
+            script.
+             $( document ).ready(function() {
+               $('#presented' ).on( "submit", function( event ) {
+                 event.preventDefault();
+                 submitForm($( this ).serialize());
+               });
+               prefillPresented();
+             });

@@ -2,23 +2,40 @@ doctype html
 html(lang="en")
 head
   include head.jade
-body
-
-  div.container
-    div.header
+body.capped-layout
+  header.capped-layout_cap.app-banner
+    span.app-banner_title IBM Cloud Data Services // Dev
     
-    div#error
-    div#message
-                      
-    div#attendedorpresented.jumbotron
-      a.btn.btn-primary.btn-lg(href="attended",role="button") I attended an event
-      &nbsp;
-      a.btn.btn-warning.btn-lg(href="presented",role="button") I presented at an event
+  div.capped-layout_body.bookend-layout
+    nav.bookend-layout_bookend.theme_light.bg_white
+      include nav.jade
       
-    div#myevents
-      h2 My events
-      ul
-      each d in docs
-        li
-          a(href="edit?id=#{d.id}") #{d.value[0]} (#{d.value[1]})  
-      
+    div.bookend-layout_body.theme_dark
+      //-section.layout_section.theme_light
+        //-p#error
+        //-p#message
+        //-p#attendedorpresented
+          //-a.button_primary(href="attended",role="button") I attended an event
+          //-&nbsp;
+          //-a.button_primary(href="presented",role="button") I presented at an event
+        
+      section.layout_section#myevents
+        h1.type_heading
+          mark.type_mark My Events
+        
+        div.table_container
+          table.table_basic
+            thead
+              tr
+                th Name
+                th Date
+                th Type
+                th Action
+            tbody
+             each d in docs
+              tr
+                td #{d.value[0]}
+                td #{d.key[1]}
+                td #{d.value[1]}
+                td
+                  a.type_link(href="edit?id=#{d.id}") Edit

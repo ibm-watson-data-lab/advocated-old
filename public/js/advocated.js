@@ -21,24 +21,23 @@ var prefillPresented = function() {
 
 var renderError = function(str) {
   $('#message').html("");
-  var html = '<div class="alert alert-danger" role="alert">';  
-  html += '<button type="button" class="close" data-dismiss="alert" aria-label="Close">';
-  html += '<span aria-hidden="true">&times;</span>'
-  html += '</button>';
+  var html = '<div class="alert-container warning">';  
+  html += '<p>';
   html += JSON.stringify(str);
-  html += '</div>'
+  html += '</p>';
+  html += '</div>';
   $('#error').html(html);
 };
 
 var renderMessage = function(str) {
   $('#error').html("");
-  var html = '<div class="alert alert-success" role="alert">';  
-  html += '<button type="button" class="close" data-dismiss="alert" aria-label="Close">';
-  html += '<span aria-hidden="true">&times;</span>'
-  html += '</button>';
+  var html = '<div class="alert-container warning">';  
+  html += '<p>';
   html += JSON.stringify(str);
-  html += '<div><a href="menu">MENU</a></div>'
-  html += '</div>'
+  html += '</p>';
+  html += '<p><a class="type_link" href="menu">My Events</a></p>';
+  html += '<div class="dialog_dismiss"><button class="button_primary" onclick="document.getElementById(\'message\').innerHTML=\'\';">Dismiss</button></div>';
+  html += '</div>';
   $('#message').html(html);
 };
 

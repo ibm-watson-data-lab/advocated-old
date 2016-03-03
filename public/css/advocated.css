@@ -1,3 +1,37 @@
 .border {
   margin-bottom:70px;
 }
+
+
+.type_link {
+    cursor: pointer;    
+}
+
+.input_text {
+    max-width: 21rem;
+}
+.input_narrow {
+    max-width: 10rem;
+}
+.input_wide {
+    max-width: 36rem;
+}
+.input_xwide {
+    max-width: 50rem;
+}
+
+.dialog_dismiss {
+	text-align: right;
+}
+
+.about_list {
+	padding-left: 25px;
+}
+
+.quote_section {
+	margin-top: 15%;
+	text-align: center;
+}
+.quote_section .type_heading {
+	max-width: 100%
+}
