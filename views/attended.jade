@@ -2,78 +2,90 @@ doctype html
 html(lang="en")
 head
   include head.jade
-body
+body.capped-layout
+  header.capped-layout_cap.app-banner
+    span.app-banner_title IBM Cloud Data Services // Dev
+    
+  div.capped-layout_body.bookend-layout
+    nav.bookend-layout_bookend.theme_light.bg_white
+      include nav.jade
+      
+    div.bookend-layout_body.theme_dark
+      //-section.layout_section.theme_light
+        //-h1.type_heading
+          //-mark.type_mark Attended an Event
+      
+      section.layout_section
+        h1.type_heading
+          mark.type_mark Attended an Event
+          
+        form(id="attended")
+          div.form_standard
+            input(type="hidden",name="collection",value="event")
+            
+            div.form_field
+              label.form_label(for="eventtitle") Title
+              input.input_text.input_wide#eventtitle.form-control(name="title",type="text",placeholder="Event Title",value="#{doc.title}")
+        
+            div.form_field
+              label.form_label(for="eventstart") Date Start
+              input.input_text.input_wide#eventstart.form-control(name="dtstart",type="date",placeholder="YYYY-MM-DD")
+              
+            div.form_field
+              label.form_label(for="eventend") Date End
+              input.input_text.input_wide#eventend.form-control(name="dtend",type="date",placeholder="YYYY-MM-DD")
+        
+            div.form_field
+              label.form_label(for="eventdescription") Description
+              textarea.input_textarea.input_wide#eventdescription.form-control(name="description")
+        
+            div.form_field
+              label.form_label(for="eventattendees") Attendees
+              input.input_text.input_wide#eventattendees.form-control(name="attendees",type="number",placeholder="the approximate number of attendees at the event")
+        
+            div.form_field
+              label.form_label(for="eventleads") Leads
+              input.input_text.input_wide#eventleads.form-control(name="leads",type="number",placeholder="the approximate number of leads generated at the event")
 
-  div.container
-    div.header
+            div.form_field
+             h3 Categories
+             div.checkbox
+               label
+               input(name="categories",type="checkbox",value="Conference")
+               | Conference
+             div.checkbox
+               label
+               input(name="categories",type="checkbox",value="Meetup")
+               | Meetup
+             div.checkbox
+               label
+               input(name="categories",type="checkbox",value="Hackathon")
+               | Hackathon
                       
-    form(id="attended")
-      h2 Attended an Event
-      input(type="hidden",name="collection",value="event")
+            div.form_field
+              h3 IBM Sponsored
+              div.checkbox
+                label
+                input(name="sponsored",type="checkbox",value="Sponsored")
+                | Yes
 
-      div.form-group
-        label(for="eventtitle") Title
-        input#eventtitle.form-control(name="title",type="text",placeholder="Event Title",value="#{doc.title}")
-
-      div.form-group
-        label(for="eventstart") Date Start
-        input#eventstart.form-control(name="dtstart",type="date",placeholder="YYYY-MM-DD")
-
-      div.form-group
-        label(for="eventend") Date End
-        input#eventend.form-control(name="dtend",type="date",placeholder="YYYY-MM-DD")
-
-      div.form-group
-        label(for="eventdescription") Description
-        textarea#eventdescription.form-control(name="description")
- 
-      div.form-group
-        label(for="eventattendees") Attendees
-        input#eventattendees.form-control(name="attendees",type="number",placeholder="the approximate number of attendees at the event")
-
-      div.form-group
-        label(for="eventleads") Leads
-        input#eventleads.form-control(name="leads",type="number",placeholder="the approximate number of leads generated at the event")
-
-       div.form-group
-         h3 Categories
-         div.checkbox
-           label
-           input(name="categories",type="checkbox",value="Conference")
-           | Conference
-         div.checkbox
-           label
-           input(name="categories",type="checkbox",value="Meetup")
-           | Meetup 
-         div.checkbox
-           label
-           input(name="categories",type="checkbox",value="Hackathon")
-           | Hackathon
-                      
-      div.form-group
-        h3 IBM Sponsored
-        div.checkbox
-          label
-          input(name="sponsored",type="checkbox",value="Sponsored")
-          | Yes
-
-      div.form-group
-        label(for="eventtags") Tags
-        input#eventtags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo")
+            div.form_field
+              label.form_label(for="eventtags") Tags
+              input.input_text.input_wide#eventtags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo")
   
-      div.form-group
-        label(for="eventcomments") Comments
-        textarea#eventcomments.form-control(name="comments")                  
+            div.form_field
+              label.form_label(for="eventcomments") Comments
+              textarea.input_textarea.input_wide#eventcomments.form-control(name="comments")                  
       
-      div#error
-      div#message            
+            div#error
+            div#message            
                                           
-      button.btn.btn-default(type="submit") Submit
+            button.button_primary(type="submit") Submit
       
-      script.
-        $( document ).ready(function() {
-          $('#attended').on( "submit", function( event ) {
-            event.preventDefault();
-            submitForm($( this ).serialize());
-          });
-        });
+            script.
+              $( document ).ready(function() {
+                $('#attended').on( "submit", function( event ) {
+                  event.preventDefault();
+                  submitForm($( this ).serialize());
+                });
+              });

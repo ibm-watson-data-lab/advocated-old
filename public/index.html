@@ -6,10 +6,44 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link href="css/master.css" rel="stylesheet">
+    <link href="css/advocated.css" rel="stylesheet">
+    
+    <script>
+      var quotes = [
+          "You've been Advocated!",
+          "To Advocate or not to Advocate?",
+          "You had me at Advocate.",
+          "To err is human; to Advocate, divine.",
+          "If you Advocate it, they will come."
+      ];
+      function randomQuote() {
+    	  var quote = quotes[Math.floor((Math.random() * quotes.length))];
+    	  document.getElementById("random-quote").innerHTML = quote;
+      }
+    </script>
   </head>
 
-  <body>
-   <h1>Advocated</h1>
+  <body class="capped-layout" onload="randomQuote()">
+<!-- start header -->
+    <header class="capped-layout_cap app-banner">
+      <span class="app-banner_title">IBM Cloud Data Services // Dev</span>
+    </header>
+<!-- end header -->
+
+<!-- start content -->
+    <div class="capped-layout_body bookend-layout">
+
+<!-- start main -->
+      <div class="bookend-layout_body theme_dark">
+        <section class="layout_section quote_section">
+            <h1 class="type_heading"><mark class="type_mark" id="random-quote">Advocated!</mark></h1>
+        </section>
+      </div>
+<!-- end main -->
+
+    </div>
   </body>
 
 </html>
