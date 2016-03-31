@@ -182,10 +182,32 @@ app.put("/doc", function(req,res) {
   events.update(doc._id, doc, function(err, data) {
     console.log("err,data",err, data);
     if (err) {
-      res.status(400).send( {ok: false, error: err.message});
+      res.status(400).send({ok: false, error: err.message});
     } else {
-      res.status(200).send( data );
+      res.status(200).send(data);
     }
+  });
+});
+
+//delete an event
+app.del("/doc/:id", function(req, res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  
+  var docid = req.params.id;
+  events.load(docid, function(err, doc) {
+	  if (err) {
+		  res.status(400).send({ok: false, error: err.message});
+	  } else {
+		  events.destroy(doc._id, doc._rev, function(err, data) {
+		    if (err) {
+		      res.status(400).send({ok: false, error: err.message});
+		    } else {
+		      res.status(200).send(data);
+		    }
+		  });
+	  }
   });
 });
 

@@ -85,4 +85,30 @@ var submitForm = function(data) {
   });
 };
 
+var deleteEvent = function(id) {
+	var req = {
+		url: ("doc/"+id),
+		method: "DELETE"
+	};
+	
+	$.ajax(req).done(function(msg) {
+		console.log(msg);
+		$("#" + id + "_delete").remove();
+		$("#" + id + "_detail").remove();
+	}).fail(function(msg) {
+		console.log("fail",msg);
+		$("#" + id + "_detail").html(msg);
+	});
+}
 
+var toggle = function(domNodeId, parentId) {
+	var expanded = $("#" + domNodeId).is(":visible");
+	if (!expanded && parentId) {
+		$("#" + parentId).toggleClass("active");
+	}
+	$("#" + domNodeId).slideToggle(500, function() {
+		if (expanded && parentId) {
+			$("#" + parentId).toggleClass("active");
+		}
+	});
+};
