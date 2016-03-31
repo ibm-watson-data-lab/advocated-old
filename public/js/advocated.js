@@ -97,7 +97,7 @@ var deleteEvent = function(id) {
 		$("#" + id + "_detail").remove();
 	}).fail(function(msg) {
 		console.log("fail",msg);
-		$("#" + id + "_detail").html(msg);
+		$("#" + id + "_delete").html(msg);
 	});
 }
 
