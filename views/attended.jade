@@ -22,6 +22,10 @@ body.capped-layout
         form(id="attended")
           div.form_standard
             input(type="hidden",name="collection",value="event")
+            if doc._id
+             input(type="hidden",name="_id",value="#{doc._id}")
+            if doc._rev
+             input(type="hidden",name="_rev",value="#{doc._rev}")
             
             div.form_field
               label.form_label(for="eventtitle") Title
@@ -29,23 +33,23 @@ body.capped-layout
         
             div.form_field
               label.form_label(for="eventstart") Date Start
-              input.input_text.input_wide#eventstart.form-control(name="dtstart",type="date",placeholder="YYYY-MM-DD")
+              input.input_text.input_wide#eventstart.form-control(name="dtstart",type="date",placeholder="YYYY-MM-DD",value=(doc.dtstart ? "#{doc.dtstart}" : ""))
               
             div.form_field
               label.form_label(for="eventend") Date End
-              input.input_text.input_wide#eventend.form-control(name="dtend",type="date",placeholder="YYYY-MM-DD")
+              input.input_text.input_wide#eventend.form-control(name="dtend",type="date",placeholder="YYYY-MM-DD",value=(doc.dtend ? "#{doc.dtend}" : ""))
         
             div.form_field
               label.form_label(for="eventdescription") Description
-              textarea.input_textarea.input_wide#eventdescription.form-control(name="description")
+              textarea.input_textarea.input_wide#eventdescription.form-control(name="description") #{doc.description}
         
             div.form_field
               label.form_label(for="eventattendees") Attendees
-              input.input_text.input_wide#eventattendees.form-control(name="attendees",type="number",placeholder="the approximate number of attendees at the event")
+              input.input_text.input_wide#eventattendees.form-control(name="attendees",type="number",placeholder="the approximate number of attendees at the event",value="#{doc.attendees}")
         
             div.form_field
               label.form_label(for="eventleads") Leads
-              input.input_text.input_wide#eventleads.form-control(name="leads",type="number",placeholder="the approximate number of leads generated at the event")
+              input.input_text.input_wide#eventleads.form-control(name="leads",type="number",placeholder="the approximate number of leads generated at the event",value="#{doc.leads}")
 
             div.form_field
              h3 Categories
@@ -71,16 +75,19 @@ body.capped-layout
 
             div.form_field
               label.form_label(for="eventtags") Tags
-              input.input_text.input_wide#eventtags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo")
+              input.input_text.input_wide#eventtags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo",value=(doc.tags ? "#{doc.tags}" : ""))
   
             div.form_field
               label.form_label(for="eventcomments") Comments
-              textarea.input_textarea.input_wide#eventcomments.form-control(name="comments")                  
+              textarea.input_textarea.input_wide#eventcomments.form-control(name="comments") #{doc.comments}
       
             div#error
             div#message            
-                                          
-            button.button_primary(type="submit") Submit
+       
+            if doc._id
+             button.button_primary(type="submit") Update
+            else
+             button.button_primary(type="submit") Submit
       
             script.
               $( document ).ready(function() {
@@ -88,4 +95,5 @@ body.capped-layout
                   event.preventDefault();
                   submitForm($( this ).serialize());
                 });
+                initCheckboxes('#{doc.sponsored}', '#{doc.categories}');
               });

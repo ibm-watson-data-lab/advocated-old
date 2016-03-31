@@ -2,7 +2,7 @@ var clearForms = function() {
   $('form').trigger("reset");
 };
 
-var prefillPresented = function() {
+var prefillPresented = function(selectedEvent) {
   var req = {
     url: "/events",
     method: "get",
@@ -13,11 +13,30 @@ var prefillPresented = function() {
     var html = "";
     html += '<option value="">-- choose an event --</option>\n';
     for (var i in msg.rows) {
-      html += '<option value="' + msg.rows[i].id + '">' + msg.rows[i].value + '</option>\n';
+      html += '<option ' + ((selectedEvent && selectedEvent == msg.rows[i].id) ? 'selected="selected"' : '') + ' value="' + msg.rows[i].id + '">' + msg.rows[i].value + '</option>\n';
     }
     $('#sessionevent').html(html);
   });
 };
+
+var initCheckboxes = function(sponsored, categories) {
+	if (sponsored == true || sponsored.toLowerCase() === "true") {
+		$('input[name="sponsored"][value="Sponsored"]').prop('checked', true);
+	}
+	if (categories) {
+		var c = [];
+		if ($.isArray(categories)) {
+			c = categories;
+		}
+		else {
+			c = categories.split(',');
+		}
+		
+		for (var i in c) {
+			$('input[name="categories"][value="' + c[i] + '"]').prop('checked', true);
+		}
+	}
+}
 
 var renderError = function(str) {
   $('#message').html("");
@@ -44,14 +63,22 @@ var renderMessage = function(str) {
 var submitForm = function(data) {
   var req = {
     url: "doc",
-    method: "post",
     data: data,
     dataType: "json"
   };
+  if (data.indexOf("_id=") == -1) {
+	  req["method"] = "post";
+  }
+  else {
+	  req["method"] = "put";
+  }
+  
   $.ajax(req).done(function(msg) {
     console.log(msg);
     renderMessage(msg);
-    clearForms();
+    if (req.method === "post") {
+    	clearForms();
+    }
   }).fail(function(msg) {
     console.log("fail",msg);
     renderError(msg);
