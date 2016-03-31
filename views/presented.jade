@@ -22,10 +22,14 @@ body.capped-layout
         form(id="presented")
           div.form_standard
             input(type="hidden",name="collection",value="session")
+            if doc._id
+             input(type="hidden",name="_id",value="#{doc._id}")
+            if doc._rev
+             input(type="hidden",name="_rev",value="#{doc._rev}")
       
             div.form_field
               label.form_label(for="sessionevent") Event
-              select.input_select.input_wide#sessionevent.form-control(name="event")
+              select.input_select.input_wide#sessionevent.form-control(name="event",value="#{doc.event}")
       
             div.form_field
               label.form_label(for="sessiontitle") Title
@@ -33,15 +37,15 @@ body.capped-layout
       
             div.form_field
               label.form_label(for="sessionstart") Date
-              input.input_text.input_wide#sessionstart.form-control(name="dtstart",type="date",placeholder="YYYY-MM-DD")
+              input.input_text.input_wide#sessionstart.form-control(name="dtstart",type="date",placeholder="YYYY-MM-DD",value=(doc.dtstart ? "#{doc.dtstart}" : ""))
       
             div.form_field
               label.form_label(for="sessiondescription") Description
-              textarea.input_textarea.input_wide#sessiondescription.form-control(name="description")
+              textarea.input_textarea.input_wide#sessiondescription.form-control(name="description") #{doc.description}
         
             div.form_field
               label.form_label(for="sessionattendees") Attendees
-              input.input_text.input_wide#sessionattendees.form-control(name="attendees",type="number",placeholder="Approximate number of attendees")
+              input.input_text.input_wide#sessionattendees.form-control(name="attendees",type="number",placeholder="Approximate number of attendees",value="#{doc.attendees}")
 
             div.form_field
               h3 IBM Sponsored
@@ -71,16 +75,19 @@ body.capped-layout
 
             div.form_field
               label.form_label(for="sessiontags") Tags
-              input.input_text.input_wide#sessiontags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo")
+              input.input_text.input_wide#sessiontags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo",value=(doc.tags ? "#{doc.tags}" : ""))
 
             div.form_field
               label.form_label(for="sessioncomments") Comments
-              input.input_text.input_wide#sessioncomments.form-control(name="comments",type="text")
+              textarea.input_textarea.input_wide#eventcomments.form-control(name="comments") #{doc.comments}
        
             div#error
             div#message   
        
-            button.button_primary(type="submit") Submit
+            if doc._id
+             button.button_primary(type="submit") Update
+            else
+             button.button_primary(type="submit") Submit
 
             script.
              $( document ).ready(function() {
@@ -88,5 +95,6 @@ body.capped-layout
                  event.preventDefault();
                  submitForm($( this ).serialize());
                });
-               prefillPresented();
+               prefillPresented('#{doc.event}');
+               initCheckboxes('#{doc.sponsored}', '#{doc.categories}');
              });

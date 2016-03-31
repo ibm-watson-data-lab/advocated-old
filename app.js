@@ -116,6 +116,26 @@ app.get("/presented", function(req,res) {
   res.render("presented", { doc: { title: req.session.title || "" } });
 });
 
+app.get("/edit", function(req,res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  
+  var docid = req.query ? req.query.id : null;
+  if (docid) {
+	  events.load(docid, function(err, doc) {
+		  var event = doc;
+		  console.log("event:", event);
+		  if (doc.collection == "session") {
+			  res.render("presented", { doc: event });
+		  }
+		  else {
+			  res.render("attended", { doc: event });
+		  }
+	  });
+  }
+});
+
 // create a new event
 app.post("/doc", function(req,res) {
   if (!req.session.user) {
@@ -138,6 +158,56 @@ app.post("/doc", function(req,res) {
     } else {
       res.status(200).send( data );
     }
+  });
+});
+
+//update an event
+app.put("/doc", function(req,res) {
+  if (!req.session.user) {
+	return res.status(403).send("Not logged in");
+  }
+  if (!req.body._id) {
+	return res.status(400).send("Event ID missing");
+  }
+  
+  var doc = req.body;
+  doc.sponsored = (doc.sponsored)?true:false;
+  doc.tags = doc.tags.split(",");
+  doc.attendees = parseInt(doc.attendees);
+  if(doc.collection == "session") {
+    doc.presenter = req.session.user._id;
+  } else {
+    doc.attendee = req.session.user._id;    
+  }
+  events.update(doc._id, doc, function(err, data) {
+    console.log("err,data",err, data);
+    if (err) {
+      res.status(400).send({ok: false, error: err.message});
+    } else {
+      res.status(200).send(data);
+    }
+  });
+});
+
+//delete an event
+app.del("/doc/:id", function(req, res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  
+  var docid = req.params.id;
+  events.load(docid, function(err, doc) {
+	  if (err) {
+		  res.status(400).send({ok: false, error: err.message});
+	  } else {
+		  events.destroy(doc._id, doc._rev, function(err, data) {
+		    if (err) {
+		      res.status(400).send({ok: false, error: err.message});
+		    } else {
+		      res.status(200).send(data);
+		    }
+		  });
+	  }
   });
 });
 

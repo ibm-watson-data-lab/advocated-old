@@ -35,3 +35,27 @@
 .quote_section .type_heading {
 	max-width: 100%
 }
+
+.collapse {
+    display: none;
+}
+
+.dialogrow > td > p {
+	font-weight: 600;
+    margin: 0 auto;
+    text-align: center;
+}
+.dialogrow > td > p > span:first-child {
+	margin: 0 10px;
+}
+
+tr.eventrow:nth-child(2n+1) {
+    background-color: #264a60 !important;
+}
+tr.eventrow:nth-child(4n+1) {
+    background-color: #152935 !important;
+}
+tr.eventrow.active,
+tr.active {
+	background-color: #007f6d !important;
+}
