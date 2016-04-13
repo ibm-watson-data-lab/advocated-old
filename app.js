@@ -7,6 +7,7 @@ var express = require('express'),
   users = require('./lib/users.js'),
   tokens = require('./lib/tokens.js'),
   events = require('./lib/events.js'),
+  slack = require('./lib/slack.js'),
   app = express(),
   appEnv = cfenv.getAppEnv(),
   session = require('express-session'),
@@ -156,6 +157,9 @@ app.post("/doc", function(req,res) {
     if (err) {
       res.status(400).send( {ok: false, error: err.message});
     } else {
+      // attach the user object
+      doc.user = req.session.user;
+      slack.formatPost(doc, function(err, data) { });
       res.status(200).send( data );
     }
   });
