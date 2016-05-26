@@ -17,11 +17,11 @@ body.capped-layout
       
       section.layout_section  
         h1.type_heading
-          mark.type_mark Published a Blog Post
+          mark.type_mark Spoke to the Press
                     
         form(id="blogged")
           div.form_standard
-            input(type="hidden",name="collection",value="blog")
+            input(type="hidden",name="collection",value="press")
             if doc._id
              input(type="hidden",name="_id",value="#{doc._id}")
             if doc._rev
@@ -31,6 +31,10 @@ body.capped-layout
               label.form_label(for="blogtitle") Title
               input.input_text.input_wide#blogtitle.form-control(name="title",value="#{doc.title}")
             
+            div.form_field
+              label.form_label(for="outlet") Outlet
+              input.input_text.input_wide#outlet.form-control(name="outlet",value="#{doc.outlet}",placeholder="e.g. New York Times")
+
             div.form_field
               label.form_label(for="blogdate") Date
               input.input_text.input_wide#blogdate.form-control(name="dtstart",type="date",placeholder="YYYY-MM-DD",value=(doc.dtstart ? "#{doc.dtstart}" : ""))
