@@ -1,0 +1,68 @@
+doctype html
+html(lang="en")
+head
+  include head.jade
+body.capped-layout
+  header.capped-layout_cap.app-banner
+    span.app-banner_title IBM Cloud Data Services // Dev
+    
+  div.capped-layout_body.bookend-layout
+    nav.bookend-layout_bookend.theme_light.bg_white
+      include nav.jade
+      
+    div.bookend-layout_body.theme_dark
+      //-section.layout_section.theme_light
+        //-h1.type_heading
+          //-mark.type_mark Presented at an Event
+      
+      section.layout_section  
+        h1.type_heading
+          mark.type_mark Spoke to the Press
+                    
+        form(id="blogged")
+          div.form_standard
+            input(type="hidden",name="collection",value="press")
+            if doc._id
+             input(type="hidden",name="_id",value="#{doc._id}")
+            if doc._rev
+             input(type="hidden",name="_rev",value="#{doc._rev}")
+      
+            div.form_field
+              label.form_label(for="blogtitle") Title
+              input.input_text.input_wide#blogtitle.form-control(name="title",value="#{doc.title}")
+            
+            div.form_field
+              label.form_label(for="outlet") Outlet
+              input.input_text.input_wide#outlet.form-control(name="outlet",value="#{doc.outlet}",placeholder="e.g. New York Times")
+
+            div.form_field
+              label.form_label(for="blogdate") Date
+              input.input_text.input_wide#blogdate.form-control(name="dtstart",type="date",placeholder="YYYY-MM-DD",value=(doc.dtstart ? "#{doc.dtstart}" : ""))
+      
+            div.form_field
+              label.form_label(for="blogurl") URL
+              input.input_text.input_wide#blogurl.form-control(name="url",type="url",value="#{doc.url}")
+
+            div.form_field
+              label.form_label(for="blogtags") Tags
+              input.input_text.input_wide#blogtags.form-control(name="tags",type="text",placeholder="e.g. Node,Geo",value=(doc.tags ? "#{doc.tags}" : ""))
+
+            div.form_field
+              label.form_label(for="blogcomments") Comments
+              textarea.input_textarea.input_wide#blogcomments.form-control(name="comments") #{doc.comments}
+       
+            div#error
+            div#message   
+       
+            if doc._id
+             button.button_primary(type="submit") Update
+            else
+             button.button_primary(type="submit") Submit
+
+            script.
+             $( document ).ready(function() {
+               $('#blogged' ).on( "submit", function( event ) {
+                 event.preventDefault();
+                 submitForm($( this ).serialize());
+               });
+             });

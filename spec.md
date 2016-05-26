@@ -67,3 +67,42 @@
   }
 }
 ```
+
+## Blog
+
+{
+   "_id": "39e7a45f904ffe701e1fe0bce3006ddd",
+   "_rev": "1-0a4b5d352a6cd008a472a10a06096eb1",
+   "collection": "blog",
+   "title": "Block chain, smart contracts and ethereum",
+   "dtstart": "2015-09-09",
+   "url": "https://developer.ibm.com/clouddataservices/2016/05/19/block-chain-technology-smart-contracts-and-ethereum/",
+   "tags": [
+       "a",
+       "b",
+       "c"
+   ],
+   "comments": "123",
+   "sponsored": false,
+   "author": "b7b12408c2b7059433eb0e87670038a3"
+}
+
+## Press
+
+{
+   "_id": "39e7a45f904ffe701e1fe0bce3006ddd",
+   "_rev": "1-0a4b5d352a6cd008a472a10a06096eb1",
+   "collection": "press",
+   "outlet": "NYT",
+   "title": "Block chain, smart contracts and ethereum",
+   "dtstart": "2015-09-09",
+   "url": "https://developer.ibm.com/clouddataservices/2016/05/19/block-chain-technology-smart-contracts-and-ethereum/",
+   "tags": [
+       "a",
+       "b",
+       "c"
+   ],
+   "comments": "123",
+   "sponsored": false,
+   "author": "b7b12408c2b7059433eb0e87670038a3"
+}

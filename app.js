@@ -38,7 +38,7 @@ var ddoc = { _id: "_design/find",
                   map: "function (doc) {\n if(doc.collection=='event' && doc.attendee) { emit([doc.attendee,doc.dtstart], doc.title); }}"
                 },
                 mystuff: {
-                  map: "function(doc) {\n if(doc.collection!='user') { var attendee=(doc.collection=='session')?doc.presenter:doc.attendee; emit([attendee,doc.dtstart], [doc.title, doc.collection] ); }}"
+                  map: "function(doc) {\n if(doc.collection!='user') { var attendee=doc.presenter || doc.attendee || doc.author; emit([attendee,doc.dtstart], [doc.title, doc.collection] ); }}"
                 }
               }};
 
@@ -117,6 +117,21 @@ app.get("/presented", function(req,res) {
   res.render("presented", { doc: { title: req.session.title || "" } });
 });
 
+app.get("/blogged", function(req,res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  res.render("blogged", { doc: { title: req.session.title || "", url: "" } });
+});
+
+app.get("/press", function(req,res) {
+  if (!req.session.user) {
+    return res.status(403).send("Not logged in");
+  }
+  res.render("press", { doc: { title: req.session.title || "", url: "", outlet:"" } });
+});
+
+
 app.get("/edit", function(req,res) {
   if (!req.session.user) {
     return res.status(403).send("Not logged in");
@@ -126,12 +141,14 @@ app.get("/edit", function(req,res) {
   if (docid) {
 	  events.load(docid, function(err, doc) {
 		  var event = doc;
-		  console.log("event:", event);
 		  if (doc.collection == "session") {
 			  res.render("presented", { doc: event });
-		  }
-		  else {
+		  } else if (doc.collection == "event") {
 			  res.render("attended", { doc: event });
+		  } else if (doc.collection == "blog") {
+			  res.render("blogged", { doc: event });
+		  } else if (doc.collection == "press") {
+			  res.render("press", { doc: event });
 		  }
 	  });
   }
@@ -146,14 +163,17 @@ app.post("/doc", function(req,res) {
   var doc = req.body;
   doc.sponsored = (doc.sponsored)?true:false;
   doc.tags = doc.tags.split(",");
-  doc.attendees = parseInt(doc.attendees);
-  if(doc.collection == "session") {
+  if (doc.attendees) {
+    doc.attendees = parseInt(doc.attendees);
+  }
+  if (doc.collection == "session") {
     doc.presenter = req.session.user._id;
-  } else {
+  } else if (doc.collection == "event") {
     doc.attendee = req.session.user._id;    
+  } else if (doc.collection == "blog" || doc.collection == "press") {
+    doc.author = req.session.user._id;    
   }
   events.save(doc, function(err, data) {
-    console.log("err,data",err, data);
     if (err) {
       res.status(400).send( {ok: false, error: err.message});
     } else {
@@ -180,11 +200,12 @@ app.put("/doc", function(req,res) {
   doc.attendees = parseInt(doc.attendees);
   if(doc.collection == "session") {
     doc.presenter = req.session.user._id;
-  } else {
+  } else if (doc.collection == "event") {
     doc.attendee = req.session.user._id;    
+  } else if (doc.collection == "blog" || doc.collection == "press") {
+    doc.author = req.session.user._id;    
   }
   events.update(doc._id, doc, function(err, data) {
-    console.log("err,data",err, data);
     if (err) {
       res.status(400).send({ok: false, error: err.message});
     } else {
@@ -194,7 +215,7 @@ app.put("/doc", function(req,res) {
 });
 
 //delete an event
-app.del("/doc/:id", function(req, res) {
+app.delete("/doc/:id", function(req, res) {
   if (!req.session.user) {
     return res.status(403).send("Not logged in");
   }
@@ -220,7 +241,6 @@ app.get("/events", function(req, res) {
     return res.status(403).send("Not logged in");
   }
   events.list(req.session.user._id, function(err,data) {
-    console.log(err,data);
     res.send(data);
   });
 })
