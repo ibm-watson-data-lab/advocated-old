@@ -45,8 +45,10 @@ var ddoc = { _id: "_design/find",
 // look for incoming requests from Slack
 app.post('/slack', function(req,res) {
   
+  var slacktokens = process.env.SLACK_TOKEN.split(',');
+
   // ensure that the incoming request has the correct token
-  if (req.body.token && req.body.token == process.env.SLACK_TOKEN) {
+  if (req.body.token && slacktokens.indexOf(req.body.token) > -1) {
     
     users.getOrSave('slack', req.body.user_name, req.body, function(err, data) {
       tokens.save({user: data, title: req.body.text}, function(err, data) {
