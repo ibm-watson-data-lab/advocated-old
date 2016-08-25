@@ -1,3 +1,7 @@
+declared-services:
+  advocated-cloudant:
+    label: cloudantNoSQLDB
+    plan: Shared
 applications:
 - path: .
   memory: 256M
@@ -6,3 +10,5 @@ applications:
   name: advocated
   host: advocated
   disk_quota: 1024M
+  services:
+  - advocated-cloudant

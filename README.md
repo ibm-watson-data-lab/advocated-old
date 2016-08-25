@@ -53,3 +53,25 @@ The posted form elements are saved as a new event document. The user id is added
 Only accessible to logged-in users. 
 
 Get a list of events. This is used to populate the event list on the "Presented" form.
+
+
+
+## Register a new team
+
+1. Create a new Slack command (/advocated as example) in your Slack team
+1. Create a new incoming webhook
+1. In Cloudant, create a new document in the "teams" database
+
+```
+{
+  "_id": "<team_id>",
+  "type": "team",
+  "name": "Team Name",
+  "slack": {
+    "token": "<the token from the command>",
+    "webhook": "<the webhook url>"
+  }
+}
+```
+
+You can obtain your team_id [here](https://api.slack.com/methods/team.info/test).

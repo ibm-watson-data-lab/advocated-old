@@ -6,6 +6,7 @@ var express = require('express'),
   moment = require('moment'),
   users = require('./lib/users.js'),
   tokens = require('./lib/tokens.js'),
+  teams = require('./lib/teams.js'),
   events = require('./lib/events.js'),
   slack = require('./lib/slack.js'),
   app = express(),
@@ -43,19 +44,29 @@ var ddoc = { _id: "_design/find",
               }};
 
 // look for incoming requests from Slack
-app.post('/slack', function(req,res) {
-  
-  // ensure that the incoming request has the correct token
-  if (req.body.token && req.body.token == process.env.SLACK_TOKEN) {
-    
-    users.getOrSave('slack', req.body.user_name, req.body, function(err, data) {
-      tokens.save({user: data, title: req.body.text}, function(err, data) {
-        res.send("Thanks for advocating. Please visit this URL to enter the details <https://" + appurl  + "/auth/"+data.id+">");
-      })
-
+app.post('/slack', function (req, res) {
+  if (req.body.team_id) {
+    teams.load(req.body.team_id, function (err, team) {
+      if (err) {
+        res.status(403).send("Team not found");
+      } else {
+        console.log("Incoming request for", team.name);
+        if (team.slack.token === req.body.token) {
+          users.getOrSave('slack', req.body.user_name, req.body, function (err, data) {
+            tokens.save({
+              user: data,
+              title: req.body.text
+            }, function (err, data) {
+              res.send("Thanks for advocating. Please visit this URL to enter the details <https://" + appurl + "/auth/" + data.id + ">");
+            });
+          });
+        } else {
+          res.status(403).send("Invalid token");
+        }
+      }
     });
   } else {
-    res.send("Invalid request.");   
+    res.send(403);
   }
 });
 
@@ -73,17 +84,23 @@ app.get("/auth/:id", function(req,res) {
     if (err) {
       return res.status(403).send("Missing or unknown token");
     }
-    
+
     // kill the token - single use only
-    tokens.remove(id, function(e,d) {
+    tokens.remove(id, function(e,d) {     
       
     });
-    
+
+    teams.load(data.user.identifiers.slack.team_id, function(err, team) {
+      if (err) {
+        res.status(403).send("Unknown team");
+      } else {
     // extract the user object from the token
     req.session.user = data.user;
     req.session.title = data.title
+    req.session.team = team;
     res.redirect("/menu");
-   
+      }
+    });   
   })
 });
 
@@ -179,7 +196,7 @@ app.post("/doc", function(req,res) {
     } else {
       // attach the user object
       doc.user = req.session.user;
-      slack.formatPost(doc, function(err, data) { });
+      slack.post(req.session.team.slack.webhook, doc, function(err, data) { });
       res.status(200).send( data );
     }
   });
@@ -246,23 +263,22 @@ app.get("/events", function(req, res) {
 })
 
 // set up the databases
-cloudant.db.create(config.TOKEN_DBNAME, function(e,d) {
-  cloudant.db.create(config.DBNAME, function(e, d) {
-  
-    // make sure design documents are in place
-    couchmigrate.migrate(config.DBNAME, ddoc, function(e, d) {
-    
-      // start server on the specified port and binding host
-      app.listen(appEnv.port, '0.0.0.0', function() {
+cloudant.db.create(config.TEAM_DBNAME, function (e, d) {
+  cloudant.db.create(config.TOKEN_DBNAME, function (e, d) {
+    cloudant.db.create(config.DBNAME, function (e, d) {
 
-      	// print a message when the server starts listening
-        console.log("server starting on " + appEnv.url);
+      // make sure design documents are in place
+      couchmigrate.migrate(config.DBNAME, ddoc, function (e, d) {
+
+        // start server on the specified port and binding host
+        app.listen(appEnv.port, '0.0.0.0', function () {
+
+          // print a message when the server starts listening
+          console.log("server starting on " + appEnv.url);
+        });
+
       });
-    
     });
   });
 });
-
-
-
 
