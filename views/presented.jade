@@ -32,8 +32,9 @@ body.capped-layout
               select.input_select.input_wide#sessionevent.form-control(name="event",value="#{doc.event}")
       
             div.form_field
-              label.form_label(for="sessiontitle") Title
-              input.input_text.input_wide#sessiontitle.form-control(name="title",type="text",placeholder="Session Title",value="#{doc.title}")
+              label.form_label(for="sessiontitle") Title 
+                span.type_mark *
+              input.input_text.input_wide#sessiontitle.form-control(name="title",type="text",placeholder="Session Title",value="#{doc.title}",required="true")
       
             div.form_field
               label.form_label(for="sessionstart") Date
@@ -81,6 +82,7 @@ body.capped-layout
               label.form_label(for="sessioncomments") Comments
               textarea.input_textarea.input_wide#eventcomments.form-control(name="comments") #{doc.comments}
        
+            div.type_mark.type_copy * Required
             div#error
             div#message   
        
@@ -91,10 +93,6 @@ body.capped-layout
 
             script.
              $( document ).ready(function() {
-               $('#presented' ).on( "submit", function( event ) {
-                 event.preventDefault();
-                 submitForm($( this ).serialize());
-               });
                prefillPresented('#{doc.event}');
                initCheckboxes('#{doc.sponsored}', '#{doc.categories}');
              });

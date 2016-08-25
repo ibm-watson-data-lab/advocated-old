@@ -28,8 +28,9 @@ body.capped-layout
              input(type="hidden",name="_rev",value="#{doc._rev}")
             
             div.form_field
-              label.form_label(for="eventtitle") Title
-              input.input_text.input_wide#eventtitle.form-control(name="title",type="text",placeholder="Event Title",value="#{doc.title}")
+              label.form_label(for="eventtitle") Title 
+                span.type_mark *
+              input.input_text.input_wide#eventtitle.form-control(name="title",type="text",placeholder="Event Title",value="#{doc.title}",required="true")
         
             div.form_field
               label.form_label(for="eventstart") Date Start
@@ -81,6 +82,7 @@ body.capped-layout
               label.form_label(for="eventcomments") Comments
               textarea.input_textarea.input_wide#eventcomments.form-control(name="comments") #{doc.comments}
       
+            div.type_mark.type_copy * Required
             div#error
             div#message            
        
@@ -91,9 +93,5 @@ body.capped-layout
       
             script.
               $( document ).ready(function() {
-                $('#attended').on( "submit", function( event ) {
-                  event.preventDefault();
-                  submitForm($( this ).serialize());
-                });
                 initCheckboxes('#{doc.sponsored}', '#{doc.categories}');
               });
