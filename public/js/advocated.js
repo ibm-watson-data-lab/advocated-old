@@ -11,7 +11,7 @@ var prefillPresented = function(selectedEvent) {
   $.ajax(req).done(function(msg) {
     console.log(msg);
     var html = "";
-    html += '<option value="">-- choose an event --</option>\n';
+    html += '<option value="">-- Choose an event (Optional) --</option>\n';
     for (var i in msg.rows) {
       html += '<option ' + ((selectedEvent && selectedEvent == msg.rows[i].id) ? 'selected="selected"' : '') + ' value="' + msg.rows[i].id + '">' + msg.rows[i].value + '</option>\n';
     }
@@ -36,7 +36,7 @@ var initCheckboxes = function(sponsored, categories) {
 			$('input[name="categories"][value="' + c[i] + '"]').prop('checked', true);
 		}
 	}
-}
+};
 
 var renderError = function(str) {
   $('#message').html("");
@@ -79,9 +79,11 @@ var submitForm = function(data) {
     if (req.method === "post") {
     	clearForms();
     }
+    resetFormButton();
   }).fail(function(msg) {
     console.log("fail",msg);
     renderError(msg);
+    resetFormButton();
   });
 };
 
@@ -99,7 +101,7 @@ var deleteEvent = function(id) {
 		console.log("fail",msg);
 		$("#" + id + "_delete").html(msg);
 	});
-}
+};
 
 var toggle = function(domNodeId, parentId) {
 	var expanded = $("#" + domNodeId).is(":visible");
@@ -112,3 +114,20 @@ var toggle = function(domNodeId, parentId) {
 		}
 	});
 };
+
+var resetFormButton = function() {
+  var btn = $('button[type="submit"]');
+  btn.prop('disabled', false)
+    .text(btn.text() === 'Updating...' ? 'Update' : 'Submit');
+};
+
+$(document).ready(function() {
+  $('form').on('submit', function(event) {
+    event.preventDefault();
+    var btn = $('button[type="submit"]');
+    btn.prop('disabled', true)
+      .text(btn.text() === 'Update' ? 'Updating...' : 'Submitting...');
+
+    submitForm($(this).serialize());
+  });
+});

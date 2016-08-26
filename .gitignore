@@ -6,3 +6,4 @@ simulate.sh
 .jshintrc
 .settings
 .DS_Store
+.vscode
