@@ -1,0 +1,40 @@
+@media all and (max-width: 750px) {
+  .app-banner {
+    padding: 15px 30px;
+  }
+  .bookend-layout {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;  
+    
+    -webkit-flex-flow: row wrap;
+    flex-flow: row wrap;
+  }
+  .bookend-layout_bookend {
+    flex: 1 100%;
+  }
+  .top-nav:after {
+    content: "\022EF";
+    font-weight: 600;
+    float: right;
+  }
+  .nav-submenu {
+    display: none;
+  }
+  .bookend-layout_body {
+    flex: 1 100%;
+  }
+  .tree-nav_link {
+    padding: 10px 30px;
+  }
+  .tree-nav .tree-nav .tree-nav_link {
+    padding-left: 45px;
+  }
+  .alert-container {
+    padding: 10px;
+    word-break: break-all;
+    word-wrap: break-word;
+  }
+}
