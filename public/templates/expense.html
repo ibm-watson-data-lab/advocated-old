@@ -1,0 +1,62 @@
+<h3>I Spent Money</h3>
+<form id="expense">
+  <input id="collection"  type="hidden" name="collection" value="expense">
+  <input type="hidden" name="_id" value="{{_id}}" />
+  <input type="hidden" name="_rev" value="{{_rev}}" />
+  <div class="row">
+    <div class="input-field col s12">
+      <input id="title" name="title" value="{{title}}" class="">
+      <label for="title" class="active">Title</label>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col s12">
+      <label for="blogdate">Date</label>
+      <input id="blogdate" name="dtstart" type="date" placeholder="YYYY-MM-DD" value="{{dtstart}}" class="validate" />
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-field col s12">
+      <textarea id="comments" name="comments" class="materialize-textarea">{{comments}}</textarea>
+      <label for="comments" class="active">Comments</label>
+    </div>
+  </div>
+  <div class="row">        
+    <div class="input-field col s3">
+      <select id="travel_expenses_currency" name="travel_expenses_currency">
+      </select>
+    </div>
+    <div class="input-field col s9">
+      <input id="travel_expenses" name="travel_expenses" type="number" step="any" value="{{travel_expenses}}">
+      <label for="travel_expenses" class="active">Travel Expenses</label>
+    </div>
+  </div>
+  <div class="row">        
+    <div class="input-field col s3">
+      <select id="non_travel_expenses_currency" name="non_travel_expenses_currency">
+      </select>
+    </div>
+    <div class="input-field col s9">
+      <input id="non_travel_expenses" name="non_travel_expenses" type="number" step="any" value="{{non_travel_expenses}}">
+      <label for="non_travel_expenses" class="active">Non-Travel Expenses</label>
+    </div>
+  </div>
+  <div class="row">
+    <div id="error"></div>
+    <div id="message"></div>
+    {{^_id}}
+    <button type="submit" class="validate btn">Submit</button>
+    {{/_id}}
+    {{#_id}}
+    <button type="submit" class="validate btn">Update</button>
+    {{/_id}}
+  </div>
+</form>
+
+<script>
+  $( document ).ready(function() {
+    $('#travel_expenses_currency').html(getCurrencyOptions('{{travel_expenses_currency}}'));
+    $('#non_travel_expenses_currency').html(getCurrencyOptions('{{non_travel_expenses_currency}}'));
+    $('select').material_select();
+  });
+</script>

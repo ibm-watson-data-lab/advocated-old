@@ -1,68 +1,47 @@
-# Advocated Service
+# /advocated
 
-A simple Node.js App that records CDS Developer Advocate activity in a Cloudant database.
+Advocated is a Developer Advocacy metrics collection application. It allows a Developer Advocate to record
 
-It: 
+- the meetups/conferences they went to
+- the talks they delivered
+- the blogs they published
+- the press interviews they gave
+- the expenses they spent
 
-1. Responds to `POST /slack` commands which create entries in the tokens database
-2. Responds to `GET /auth/:id` commands which redeem tokens
-3. Responds to `POST /doc` API commands which creates an entry into the database
-4. GET /menu which renders the single-page web app
-5. GET /events which returns the list of events in newest-first order
+Advocated is built as an *Offline-First* web application. Data is stored in PouchDB in a web browser and synced to a Cloudant database at a later date. This allows data to be collected in the most remote of locations, even when there's no network connection.
 
-See [spec.md](spec.md) for the working spec.
+## Built with Envoy
 
-## POST /slack
+Instead of replicating directly with Cloudant, Advocated has [Cloudant Envoy](https://www.npmjs.com/package/cloudant-envoy) baked in which means although it appears that each user has their own database (in a one-database-per-user design pattern), Envoy actually stores the data in a single database on the server side which  makes it easier to query all the Advocates' data in one place.
 
-A "slash command" integration with Slack can be used to make a call to `<yoururl>/slack`. The app reads the value of the environment variable `SLACK_TOKEN`. If it matches the incoming token provided by slack, then the "text" field is used stored, together with the user that generated the request in the 'tokens' database in Cloudant.
-  
-A URL is forumulated e.g. /auth/45eb326c52907e2b9d2a81ca000037cc, where '45eb326c52907e2b9d2a81ca000037cc' is the id of the token document.
+## Installing
 
-The API call then returns the URL of where the user can go to login to the Advocated portal.
+Clone this repository and run `npm install` to fetch its dependencies. It needs 'admin' access to a Cloudant account so create an environment variable called `COUCH_HOST` containing the full URL of your Cloudant account e.g.
 
-## GET /auth/:id
-
-When the user visits the URL, the token document is retrieved which gives the app
-
-* the user document
-* the provisional title of the event
-
-The above items are stored in session and then the browser is bounced to `/menu`.
-
-
-## GET /menu
-
-Only accessible to logged-in users. 
-
-Renders a form with two options
-
-* I attended an event
-* I presented an event
-
-Click on each button reveals the respective forms, the submission of which causes "POST /doc" calls to be made
-
-## POST /doc
-
-Only accessible to logged-in users. 
-
-The posted form elements are saved as a new event document. The user id is added from session and some fields are tidied up before saving (i.e. integers are parsed as integeres etc)
-
-
-## GET /events
-
-Only accessible to logged-in users. 
-
-Get a list of events. This is used to populate the event list on the "Presented" form.
-
-
-
-## Register a new team
-
-1. Create a new Slack command (/advocated as example) in your Slack team
-1. Create a new incoming webhook
-1. In Cloudant, create a new document in the "teams" database
-
+```sh
+export COUCH_HOST="https://myusername:mypassword@myaccount.cloudant.com"
 ```
+
+## Databases
+
+This app uses several Cloudant databases:
+
+- envoy - where all the user data is stored
+- envoyusers - the collection of users who can authenticate 
+- teams - a collection of Slack teams
+- groups - a collection of arbitrary groups of users for reporting purposes
+- tokens - a collection of one-time authenticaton tokens
+
+## Teams
+
+Advocated authenticates via a Slack "slash command". You can have as many Slack accounts as you like simply
+
+- create a Cloudant database called 'teams'
+- create a new Slack 'slash command' pointing to the `POST <yoururl>/slack` endpoint of your Advocated install - make a note of the token
+- create a new incoming webhook in your Slack admin - make a note of the URL
+- in Cloudant, create a new document in the "teams" database
+
+```js
 {
   "_id": "<team_id>",
   "type": "team",
@@ -75,3 +54,33 @@ Get a list of events. This is used to populate the event list on the "Presented"
 ```
 
 You can obtain your team_id [here](https://api.slack.com/methods/team.info/test).
+
+## Authentication
+
+Authentication is via the Slack "slash command". It can also be simulated using `curl`
+
+```sh
+> curl -X POST -d 'token=<the token from the command>&user_id=<unique slack user id>&team_id=<unique slack team id>&text=woo&user_name=glynn.bird' 'http://localhost:6016/slack'
+Thanks for advocating. Please visit this URL to enter the details <https://localhost:6016/?token=8e6d6729-fbd1-4ad5-93bb-e6f8c8db6bff#token.html>
+```
+
+Note: when running locally you may have to change "https" for "http" for the url to work.
+
+## Differences with version 1
+
+### Data location 
+
+In the first version of `/advocated` the users themselves were stored in the same database as the sessions, events, blogs etc. When using Envoy, this is not possible. Envoy stores its users in a 'envoyusers' database and the format of the JSON is different.
+
+- teams - one document per Slack account
+- envoyusers - one document per user
+- advocated2 - the database containing all the sessions/events/blogs/etc for all users
+- tokens - one document per issued login token.
+
+## HTML Templating
+
+In the first version the HTML was generated server-side using Jade templates using a custom CSS stylesheet. The new version uses the MaterializeCSS framework and Mustache client-side templates.
+
+## Slack posting
+
+In the first version, all new postings came through the Node.js app and were posted to Slack. In the new version, new postsings are saved to each users' PouchDB database. Only when the database is synced can the Slack posting be made. The server-side app listens to changes on the database where postings are stored and posts any changes that result in a new 'rev=1-*' document.

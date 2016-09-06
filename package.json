@@ -1,25 +1,34 @@
 {
-  "name": "Advocated",
-  "version": "0.0.1",
-  "description": "A Node.js app to record CDS Developer Advocacy activity",
+  "name": "advocated",
+  "version": "1.0.0",
+  "description": "An offline-first data collection app",
+  "main": "app.js",
   "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"
   },
-  "dependencies": {
-    "async": "^1.5.0",
-    "body-parser": "^1.14.1",
-    "cfenv": "1.0.x",
-    "cloudant": "^1.4.3",
-    "debug": "^2.2.0",
-    "express": "4.12.x",
-    "express-session": "^1.12.1",
-    "jade": "^1.11.0",
-    "moment": "^2.10.6",
-    "request": "^2.71.0",
-    "underscore": "^1.8.3"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ibm-cds-labs/advocated.git"
   },
-  "repository": {},
-  "engines": {
-    "node": "0.12.x"
+  "keywords": [
+    "adovcated",
+    "offline-first"
+  ],
+  "author": "Glynn Bird <glynn.bird@gmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ibm-cds-labs/advocated/issues"
+  },
+  "homepage": "https://github.com/ibm-cds-labs/advocated#readme",
+  "dependencies": {
+    "async": "^2.0.1",
+    "body-parser": "^1.15.2",
+    "cfenv": "^1.0.3",
+    "cloudant-envoy": "^0.2.2",
+    "crypto-js": "^3.1.6",
+    "express": "^4.14.0",
+    "request": "^2.74.0",
+    "uuid": "^2.0.2"
   }
 }

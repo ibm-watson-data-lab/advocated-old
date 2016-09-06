@@ -1,63 +1,69 @@
-var express = require('express'),
-  cfenv = require('cfenv'),
-  cloudant = require('./lib/db.js'),
-  couchmigrate = require('./lib/couchmigrate.js'), 
-  config = require('./lib/config.js'),
-  moment = require('moment'),
-  users = require('./lib/users.js'),
-  tokens = require('./lib/tokens.js'),
-  teams = require('./lib/teams.js'),
-  events = require('./lib/events.js'),
-  slack = require('./lib/slack.js'),
-  app = express(),
+
+var cfenv = require('cfenv'),
+  path = require('path'),
   appEnv = cfenv.getAppEnv(),
-  session = require('express-session'),
-  appurl = (appEnv.app.application_uris)?appEnv.app.application_uris[0]:"localhost:"+appEnv.port;
+  async = require('async'),
+  express = require('express'),
+  bodyParser = require('body-parser'),s
+  CryptoJS = require("crypto-js"),
+  slack = require('./lib/slack.js'),
+  router = express.Router();
+  cloudant = null,
+  teamsdb = null,
+  tokensdb = null,
+  uuid = require('uuid'),
+  appurl = (appEnv.app.application_uris)?appEnv.app.application_uris[0]:"localhost:"+appEnv.port,
+  thekey = 'bj0uSrR1WZtxIZ6thpMX',
+  dbName = 'advocated2';
 
-// initialise session support
-app.use(session({
-  secret: appurl, cookie: { }
-}));
+var encrypt = function(str, key) {
+  return CryptoJS.AES.encrypt(str, key).toString();
+};
 
-// body parsing
-var bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: false }));
+var decrypt = function(str, key) {
+  var bytes  = CryptoJS.AES.decrypt(str, key);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};
 
-// use the jade templating engine
-app.set('view engine', 'jade');
-
-// serve the files out of ./public as our main files
-app.use(express.static(__dirname + '/public'));
-
-// CouchDB Design document
-var ddoc = { _id: "_design/find", 
-             views: {
-                userbyidentifier: {
-                  map: "function (doc) {\n if(doc.collection=='user') { for(var i in doc.identifiers) { emit([i, doc.identifiers[i].user_id ], null);}}\n}"
-                },
-                eventslist: {
-                  map: "function (doc) {\n if(doc.collection=='event' && doc.attendee) { emit([doc.attendee,doc.dtstart], doc.title); }}"
-                },
-                mystuff: {
-                  map: "function(doc) {\n if(doc.collection!='user') { var attendee=doc.presenter || doc.attendee || doc.author; emit([attendee,doc.dtstart], [doc.title, doc.collection] ); }}"
-                }
-              }};
-
-// look for incoming requests from Slack
-app.post('/slack', function (req, res) {
-  if (req.body.team_id) {
-    teams.load(req.body.team_id, function (err, team) {
+var createUser = function(q, team, callback) {
+  envoy.auth.getUser(q.user_id, function (err, data) {
+    if (err) {
+      var meta = {
+        user_name: q.user_name,
+        team_id: team._id,
+        team_name: team.name
+      };
+      console.log("created new user", q.user_id, meta);
+      var password = uuid.v4();
+      meta.password = encrypt(password, thekey);
+      envoy.auth.newUser(q.user_id, password, meta, function (err, data) {
+        envoy.auth.getUser(q.user_id, function(err, data) {
+          callback(err, data);
+        });
+      })
+    } else {
+      console.log("User already exists", data);
+      callback(err, data);
+    }
+  });
+}
+ 
+router.post('/slack', bodyParser.urlencoded({ extended: false }), function(req, res) {
+  var q = req.body;s
+  if (q.team_id) {
+    console.log("Incoming slack request for team_id", q.team_id);
+    teamsdb.get(q.team_id, function (err, team) {
       if (err) {
         res.status(403).send("Team not found");
       } else {
-        console.log("Incoming request for", team.name);
-        if (team.slack.token === req.body.token) {
-          users.getOrSave('slack', req.body.user_name, req.body, function (err, data) {
-            tokens.save({
-              user: data,
-              title: req.body.text
-            }, function (err, data) {
-              res.send("Thanks for advocating. Please visit this URL to enter the details <https://" + appurl + "/auth/" + data.id + ">");
+        // if the incoming token matches the team token
+        if (team.slack.token === q.token) {
+          createUser(q, team, function(err, data) {
+            data._id = uuid.v4();
+            data.ts = new Date().getTime() + 1000*60*60;
+            delete data._rev;
+            tokensdb.insert(data, function (err, data) {
+              res.send("Thanks for advocating. Please visit this URL to enter the details <https://" + appurl + "/#token.html?token=" + data.id + ">");
             });
           });
         } else {
@@ -70,215 +76,78 @@ app.post('/slack', function (req, res) {
   }
 });
 
-
-// authenticate
-app.get("/auth/:id", function(req,res) {
-  
-  // extract the token
-  var id = req.params.id;
-  if (!id) {
-    return res.status(403).send("Invalid token");
-  }
-  
-  tokens.load(id, function(err, data) {
+// exchange
+router.get('/api/token/:token', function(req, res) {
+  tokensdb.get(req.params.token, function(err, data) {
     if (err) {
-      return res.status(403).send("Missing or unknown token");
-    }
-
-    // kill the token - single use only
-    tokens.remove(id, function(e,d) {     
-      
-    });
-
-    teams.load(data.user.identifiers.slack.team_id, function(err, team) {
-      if (err) {
-        res.status(403).send("Unknown team");
+      res.send({ok: false});
+    } else {
+      tokensdb.destroy(data._id, data._rev);
+      if (data.ts > new Date().getTime()) {
+        data.meta.password = decrypt(data.meta.password, thekey);
+        res.send(data);
       } else {
-    // extract the user object from the token
-    req.session.user = data.user;
-    req.session.title = data.title
-    req.session.team = team;
-    res.redirect("/menu");
+        res.send({ok: false, msg: 'out of date'});
       }
-    });   
-  })
-});
-
-app.get("/about", function(req,res) {
-  if (!req.session.user) {
-    return res.status(403).send("Not logged in");
-  }
-  res.render("about", { doc: { title: req.session.title || "" } });
-});
-
-app.get("/menu", function(req,res) {
-  if (!req.session.user) {
-    return res.status(403).send("Not logged in");
-  }
-  events.mystuff(req.session.user._id, function(err, data) {
-    res.render("doc", { doc: { title: req.session.title || "" }, docs: data.rows})
-  });
-});
-
-app.get("/attended", function(req,res) {
-  if (!req.session.user) {
-    return res.status(403).send("Not logged in");
-  }
-  res.render("attended", { doc: { title: req.session.title || "" } });
-});
-
-app.get("/presented", function(req,res) {
-  if (!req.session.user) {
-    return res.status(403).send("Not logged in");
-  }
-  res.render("presented", { doc: { title: req.session.title || "" } });
-});
-
-app.get("/blogged", function(req,res) {
-  if (!req.session.user) {
-    return res.status(403).send("Not logged in");
-  }
-  res.render("blogged", { doc: { title: req.session.title || "", url: "" } });
-});
-
-app.get("/press", function(req,res) {
-  if (!req.session.user) {
-    return res.status(403).send("Not logged in");
-  }
-  res.render("press", { doc: { title: req.session.title || "", url: "", outlet:"" } });
-});
-
-
-app.get("/edit", function(req,res) {
-  if (!req.session.user) {
-    return res.status(403).send("Not logged in");
-  }
-  
-  var docid = req.query ? req.query.id : null;
-  if (docid) {
-	  events.load(docid, function(err, doc) {
-		  var event = doc;
-		  if (doc.collection == "session") {
-			  res.render("presented", { doc: event });
-		  } else if (doc.collection == "event") {
-			  res.render("attended", { doc: event });
-		  } else if (doc.collection == "blog") {
-			  res.render("blogged", { doc: event });
-		  } else if (doc.collection == "press") {
-			  res.render("press", { doc: event });
-		  }
-	  });
-  }
-});
-
-// create a new event
-app.post("/doc", function(req,res) {
-  if (!req.session.user) {
-    return res.status(403).send("Not logged in");
-  }
-  
-  var doc = req.body;
-  doc.sponsored = (doc.sponsored)?true:false;
-  doc.tags = doc.tags.split(",");
-  if (doc.attendees) {
-    doc.attendees = parseInt(doc.attendees);
-  }
-  if (doc.collection == "session") {
-    doc.presenter = req.session.user._id;
-  } else if (doc.collection == "event") {
-    doc.attendee = req.session.user._id;    
-  } else if (doc.collection == "blog" || doc.collection == "press") {
-    doc.author = req.session.user._id;    
-  }
-  events.save(doc, function(err, data) {
-    if (err) {
-      res.status(400).send( {ok: false, error: err.message});
-    } else {
-      // attach the user object
-      doc.user = req.session.user;
-      slack.post(req.session.team.slack.webhook, doc, function(err, data) { });
-      res.status(200).send( data );
     }
   });
 });
 
-//update an event
-app.put("/doc", function(req,res) {
-  if (!req.session.user) {
-	return res.status(403).send("Not logged in");
-  }
-  if (!req.body._id) {
-	return res.status(400).send("Event ID missing");
-  }
-  
-  var doc = req.body;
-  doc.sponsored = (doc.sponsored)?true:false;
-  doc.tags = doc.tags.split(",");
-  doc.attendees = parseInt(doc.attendees);
-  if(doc.collection == "session") {
-    doc.presenter = req.session.user._id;
-  } else if (doc.collection == "event") {
-    doc.attendee = req.session.user._id;    
-  } else if (doc.collection == "blog" || doc.collection == "press") {
-    doc.author = req.session.user._id;    
-  }
-  events.update(doc._id, doc, function(err, data) {
+// setup envoy with our static files
+var opts = {
+    databaseName: dbName,
+    port: appEnv.port,
+    logFormat: 'dev',
+    production: true,
+    static: path.join(__dirname, './public'),
+    router: router
+};
+
+// queue to deal with outgoing Slack requests
+var q = async.queue(function(payload, done) {
+  envoy.db.get(payload, function(err, data) {
     if (err) {
-      res.status(400).send({ok: false, error: err.message});
-    } else {
-      res.status(200).send(data);
+      return done();
     }
-  });
-});
-
-//delete an event
-app.delete("/doc/:id", function(req, res) {
-  if (!req.session.user) {
-    return res.status(403).send("Not logged in");
-  }
-  
-  var docid = req.params.id;
-  events.load(docid, function(err, doc) {
-	  if (err) {
-		  res.status(400).send({ok: false, error: err.message});
-	  } else {
-		  events.destroy(doc._id, doc._rev, function(err, data) {
-		    if (err) {
-		      res.status(400).send({ok: false, error: err.message});
-		    } else {
-		      res.status(200).send(data);
-		    }
-		  });
-	  }
-  });
-});
-
-app.get("/events", function(req, res) {
-  if (!req.session.user) {
-    return res.status(403).send("Not logged in");
-  }
-  events.list(req.session.user._id, function(err,data) {
-    res.send(data);
-  });
-})
-
-// set up the databases
-cloudant.db.create(config.TEAM_DBNAME, function (e, d) {
-  cloudant.db.create(config.TOKEN_DBNAME, function (e, d) {
-    cloudant.db.create(config.DBNAME, function (e, d) {
-
-      // make sure design documents are in place
-      couchmigrate.migrate(config.DBNAME, ddoc, function (e, d) {
-
-        // start server on the specified port and binding host
-        app.listen(appEnv.port, '0.0.0.0', function () {
-
-          // print a message when the server starts listening
-          console.log("server starting on " + appEnv.url);
-        });
-
-      });
+    teamsdb.get(data.teamid, function(err, team) {
+      var url = team.slack.webhook;
+      slack.post(url, data, done);
     });
   });
+},1);
+
+
+// run envoy
+var envoy = require('cloudant-envoy')(opts);
+envoy.events.on('listening', function() {
+  // create databases
+  cloudant = envoy.cloudant;
+  cloudant.db.create('teams');
+  cloudant.db.create('tokens');
+
+  // use the databases
+  teamsdb = cloudant.db.use('teams');
+  tokensdb = cloudant.db.use('tokens');
+  console.log('[OK]  Server is up');
+
+  // listen for changes on the Envoy datbase
+  var feed = envoy.db.follow({since: 'now'});
+  feed.on('change', function(change) {
+    var isnew = false;
+    for (var i in change.changes) {
+      // if this is the first time we've seen this doc
+      if (change.changes[i].rev.match(/^1/)) {
+        isnew = true;
+        break;
+      }
+    }
+    if (isnew) {
+      q.push(change.id);
+    }
+  });
+  feed.follow();
+
 });
+
+
 

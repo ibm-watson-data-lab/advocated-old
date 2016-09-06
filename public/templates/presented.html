@@ -1,0 +1,117 @@
+<h3>I Presented At An Event</h3>
+  
+<form id="presented">
+  <input id="collection" type="hidden" name="collection" value="session" />
+  <input type="hidden" name="_id" value="{{_id}}" />
+  <input type="hidden" name="_rev" value="{{_rev}}" />
+  <div class="row">
+    <div class="input-field col s12">
+      <select id="sessionevent" name="event">
+        <option value="">...</option>
+        <option value="123">123</option>
+      </select>
+      <label for="sessionevent">Event</label>
+    </div>
+  </div>
+  <div class="row">      
+    <div class="input-field col s12">
+      <input id="sessiontitle" name="title" type="text" placeholder="Session Title" value="{{title}}" class="" />
+      <label for="sessiontitle" class="active">Title</label>
+    </div>
+  </div>
+  <div class="row"> 
+    <div class="col s12">
+      <label for="sessionstart">Date</label>
+      <input id="sessionstart" name="dtstart" type="date" placeholder="YYYY-MM-DD" value="{{dtstart}}" class="validate" />
+    </div>
+  </div>
+  <div class="row">         
+    <div class="input-field col s12">
+      <textarea id="sessiondescription" name="description" class="materialize-textarea">{{description}}</textarea>
+      <label for="sessiondescription" class="active">Description</label>
+    </div>
+  </div>
+  <div class="row">            
+    <div class="input-field col s12">
+      <input id="sessionattendees" name="attendees" type="number" placeholder="Approximate number of attendees" value="{{attendees}}" class="">
+      <label for="sessionattendees" class="active">Attendees</label>
+    </div>
+  </div>
+  <div class="row">          
+    <div class="input-field col s12">
+      <div>
+        <input id="categories1" name="categories" type="checkbox" data-meta="grouped" value="Conference"/>
+        <label for="categories1">Conference</label>
+      </div>
+      <div>
+        <input id="categories2" name="categories" type="checkbox" data-meta="grouped" value="Meetup" />
+        <label for="categories2">Meetup</label>
+      </div>
+      <div>
+        <input id="categories3" name="categories" type="checkbox" data-meta="grouped" value="Hackathon" />
+        <label for="categories3">Hackathon</label>
+      </div>
+      <div>
+        <input id="categories4" name="categories" type="checkbox" data-meta="grouped" value="Webinar" />
+        <label for="categories4">Webinar</label>
+      </div>
+    </div>
+  </div>
+  <div class="row">  
+    <div class="input-field col s12">
+      <div>
+        <input id="sponsored" name="sponsored" type="checkbox" value="Sponsored">
+        <label for="sponsored">Sponsored</label>
+      </div>
+    </div>
+  </div>
+  <div class="row">        
+    <div class="input-field col s12">
+      <input id="sessiontags" name="tags" type="text" placeholder="e.g. Node,Geo" value="{{tags}}" class="">
+      <label for="sessiontags" class="active">Tags</label>
+    </div>
+  </div>
+  <div class="row">        
+    <div class="input-field col s12">
+      <textarea id="sessioncomments" name="comments" class="materialize-textarea">{{comments}}</textarea>
+      <label for="sessioncomments" class="active">Comments</label>
+    </div>
+  </div>
+  <div class="row">
+    <div id="error"></div>
+    <div id="message"> </div>
+    {{^_id}}
+    <button type="submit" class="validate btn">Submit</button>
+    {{/_id}}
+    {{#_id}}
+    <button type="submit" class="validate btn">Update</button>
+    {{/_id}}
+  </div>
+</form>
+
+<script>
+    $( document ).ready(function() {
+      // fill the events control with a list of events
+      var prefillEvents = function(selectedEvent) {
+        var map = function(doc) {
+          if (doc.collection === 'event') {
+            emit(doc.ts, null);
+          }
+        }
+        db.query(map, {include_docs:true, descending:true, limit: 50}).then(function(data) {
+          console.log(data);
+          var html = '<option value="">---choose event (optional)---</option>\n';
+          for(var i in data.rows) {
+            var doc = data.rows[i].doc;
+            html += '<option ' + ((selectedEvent && selectedEvent == doc._id) ? 'selected="selected"' : '') + ' value="' + doc._id + '">' + doc.title + '</option>\n';
+          }
+          console.log("HTML",html);
+          $('#sessionevent').html(html);
+          $('select').material_select();
+        });
+      }
+
+      prefillEvents('{{event}}');
+      initCheckboxes('{{sponsored}}', '{{categories}}');
+    });
+</script>

@@ -1,0 +1,60 @@
+
+<script>
+  var dateformat = d3.time.format('%b-%Y');
+
+  db.query('index/thingsByMonth', {group_level: 3}).then(function(data) {
+    // console.log('thingsByMonth:', JSON.stringify(data));
+    SimpleDataVis()
+      .attr('type', 'stacked-bar-chart')
+      .on('data', function(d) {
+        var kf = function(d) { return dateformat(new Date(d.key[0] + '-' + d.key[1])); };
+        var rf = function(l) {
+          var v = {};
+          l.forEach(function(d) {
+            v[d.key[2]] ? v[d.key[2]] += d.value : v[d.key[2]] = d.value;
+          });
+          return v;
+        };
+
+        var results = [];
+
+        if (data.rows && data.rows.length > 0) {
+          results = d3.nest()
+            .key(kf)
+            .rollup(rf)
+            .entries(data.rows);
+        }
+
+        results.forEach(function(d) {
+          d.value = d.values;
+        });
+
+        return results;
+      })
+      .render('#thingsbymonth');
+  });
+
+  db.query('index/audienceByMonth', {group_level: 2}).then(function(data) {
+    // console.log('audienceByMonth:', JSON.stringify(data));
+    SimpleDataVis()
+      .attr('type', 'grouped-bar-chart')
+      .on('data', function(d) {
+        var months = data.rows || [];
+        months.forEach(function(month) {
+          month.audience = month.value;
+          month.key = dateformat(new Date(month.key[0] + '-' + month.key[1]));
+          delete month.value;
+        });
+        // console.log('audienceByMonth:transformed:', JSON.stringify(months));
+        return months;
+      })
+      .render('#audiencebymonth');
+  });
+
+
+</script>
+
+<h3>Activities by Month</h3>
+<div class="advocated-chart" id="thingsbymonth"></div>
+<h3>Audience by Month</h3>
+<div class="advocated-chart" id="audiencebymonth"></div>

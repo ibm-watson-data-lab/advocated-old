@@ -1,0 +1,36 @@
+
+.rotm90 {
+    -ms-transform: rotate(-90deg); /* IE 9 */
+    -webkit-transform: rotate(-90deg); /* Chrome, Safari, Opera */
+    transform: rotate(-90deg);
+}
+
+.rotp90 {
+    -ms-transform: rotate(90deg); /* IE 9 */
+    -webkit-transform: rotate(90deg); /* Chrome, Safari, Opera */
+    transform: rotate(90deg);
+}
+
+.collapse {
+    display: none;
+}
+
+.deleteconfirm {
+    padding-top: 0;
+    text-align: center;
+}
+
+#audiencebymonth svg text.legend,
+#audiencebymonth svg rect.legend {
+    display: none;
+}
+
+#mapid { height: 200px; }
+
+.leaflet-container {
+    background: #aaf;
+}
+
+.mycon {
+  color: #4cb6ac
+}
