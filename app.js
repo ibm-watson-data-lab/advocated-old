@@ -49,7 +49,7 @@ var createUser = function(q, team, callback) {
 }
  
 router.post('/slack', bodyParser.urlencoded({ extended: false }), function(req, res) {
-  var q = req.body;s
+  var q = req.body;
   if (q.team_id) {
     console.log("Incoming slack request for team_id", q.team_id);
     teamsdb.get(q.team_id, function (err, team) {
