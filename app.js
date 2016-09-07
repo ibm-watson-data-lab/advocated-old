@@ -11,6 +11,7 @@ var cfenv = require('cfenv'),
   cloudant = null,
   teamsdb = null,
   tokensdb = null,
+  notificationsdb = null,
   uuid = require('uuid'),
   appurl = (appEnv.app.application_uris)?appEnv.app.application_uris[0]:"localhost:"+appEnv.port,
   thekey = 'bj0uSrR1WZtxIZ6thpMX',
@@ -111,7 +112,15 @@ var q = async.queue(function(payload, done) {
     }
     teamsdb.get(data.teamid, function(err, team) {
       var url = team.slack.webhook;
-      slack.post(url, data, done);
+      notificationsdb.get(payload, function(err, d) {
+        if (err) {
+          slack.post(url, data, done);
+          notificationsdb.insert({_id: payload, done:true});
+        } else {
+          done();
+        }
+      });
+      
     });
   });
 },1);
@@ -124,10 +133,12 @@ envoy.events.on('listening', function() {
   cloudant = envoy.cloudant;
   cloudant.db.create('teams');
   cloudant.db.create('tokens');
+  cloudant.db.create('notifications');
 
   // use the databases
   teamsdb = cloudant.db.use('teams');
   tokensdb = cloudant.db.use('tokens');
+  notificationsdb = cloudant.db.use('notifications');
   console.log('[OK]  Server is up');
 
   // listen for changes on the Envoy datbase
