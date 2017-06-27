@@ -188,6 +188,12 @@ var initForm = function() {
 
     submitForm('#' + $(this).attr('id'));
   });
+
+  // pickadate
+  $('.datepicker').pickadate({
+    format: 'yyyy-mm-dd',
+    formatSubmit: 'yyyy-mm-dd'
+  });
 };
 
 var updatePage = function() {
@@ -348,8 +354,6 @@ $(document).ready(function(){
 
   // render the page
   updatePage();
-  
 
-  
 });
 

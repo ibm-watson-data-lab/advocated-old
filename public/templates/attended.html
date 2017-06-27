@@ -13,13 +13,13 @@
   <div class="row">
     <div class="col s12">
       <label for="eventstart">Date Start</label>
-      <input id="eventstart" name="dtstart" type="date" value="{{dtstart}}" class="datepicker" />
+      <input id="eventstart" name="dtstart" type="date" placeholder="YYYY-MM-DD" value="{{dtstart}}" class="datepicker" />
     </div>
   </div>
   <div class="row">
     <div class="col s12">
       <label for="eventend">Date End</label>
-      <input id="eventend" name="dtend" type="date" value="{{dtend}}" class="datepicker" />
+      <input id="eventend" name="dtend" type="date" placeholder="YYYY-MM-DD" value="{{dtend}}" class="datepicker" />
     </div>
   </div>
   <div class="row">      
@@ -99,12 +99,12 @@
   <div class="row">    
     <div class="col s3">
       <div class="input-field">
-        <input id="latitude" name="latitude" type="number" step="0.0001" value="{{latitude}}">
         <label for="latitude" class="active">Latitude</label>
+        <input id="latitude" name="latitude" type="number" step="0.0001" value="{{latitude}}">
       </div>
       <div class="input-field">
-        <input id="longitude" name="longitude" type="number" step="0.0001" value="{{longitude}}">
         <label for="longitude" class="active">Longitude</label>
+        <input id="longitude" name="longitude" type="number" step="0.0001" value="{{longitude}}">
       </div>
       <div class="input-field">
         <a id="geolocate" class="btn-floating btn-large waves-effect waves-light red" href="#"><i class="material-icons">my_location</i></a>
@@ -133,7 +133,7 @@
     $('#non_travel_expenses_currency').html(getCurrencyOptions('{{non_travel_expenses_currency}}'));
     initCheckboxes('{{sponsored}}', '{{categories}}');
     $('select').material_select();
-    var drawPin = function(map) {
+    var drawPin = function(map, zoom) {
       try {
         var lat = parseFloat($('#latitude').val());
         var long = parseFloat($('#longitude').val());
@@ -145,21 +145,30 @@
           map.removeLayer(marker);
         }
         marker = L.marker([lat,long]).addTo(map);
-        map.setView([lat,long],3);
+        
+        if (zoom) {
+          map.setView(new L.LatLng(lat, long), zoom);
+        }
+        else {
+          map.setView(new L.LatLng(lat, long));
+        }
       } catch(e) {
         console.log(e);
       }
     }
     var mapoptions = {
-      dragging: false,
       touchZoom: false,
       scrollWheelZoom: false,
-      doubleClickZoom: false,
       boxZoom: false,
       keyboard: false,
-      zoomControl: false
+      center: [45.7818, -40.6787],
+      minZoom: 2,
+      zoom: 3
     }
-    var mymap = L.map('mapid', mapoptions).setView([20, 0], 1);
+    var mymap = L.map('mapid', mapoptions);
+    L.tileLayer( 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(mymap);
     mymap.on('locationfound', function(ev) {
       $('#geolocate').removeClass('disabled');
       $('#latitude').val(ev.latitude.toFixed(4).toString());
@@ -179,22 +188,13 @@
       drawPin(mymap);
     });
 
-    // render our GeoJSON world
-    $.ajax({url: '/js/world.json',
-        success: function(data) {
-          var style = {
-              color: "#666",
-              fillColor: "#66bb66",
-              fillOpacity: 1.0,
-              weight: 1,
-              opacity: 1
-          };
-          var opts = {
-            style: style
-          }
-          var l = L.geoJson(data, opts).addTo(mymap);
-          drawPin(mymap);
-        }
-      });
+    var popup = L.popup();
+    mymap.on('click', function(e) {
+      $('#latitude').val(e.latlng.lat.toFixed(4).toString());
+      $('#longitude').val(e.latlng.lng.toFixed(4).toString());
+      drawPin(mymap);
+    });
+
+    drawPin(mymap, 7);
   });
 </script>
