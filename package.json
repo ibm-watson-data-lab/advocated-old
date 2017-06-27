@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ibm-cds-labs/advocated.git"
+    "url": "git+https://github.com/ibm-watson-data-lab/advocated.git"
   },
   "keywords": [
     "adovcated",
@@ -18,9 +18,9 @@
   "author": "Glynn Bird <glynn.bird@gmail.com>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/ibm-cds-labs/advocated/issues"
+    "url": "https://github.com/ibm-watson-data-lab/advocated/issues"
   },
-  "homepage": "https://github.com/ibm-cds-labs/advocated#readme",
+  "homepage": "https://github.com/ibm-watson-data-lab/advocated#readme",
   "dependencies": {
     "async": "^2.0.1",
     "body-parser": "^1.15.2",
