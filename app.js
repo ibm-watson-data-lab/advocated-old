@@ -110,17 +110,14 @@ var q = async.queue(function(payload, done) {
     if (err) {
       return done();
     }
-    teamsdb.get(data.teamid, function(err, team) {
-      var url = team.slack.webhook;
-      notificationsdb.get(payload, function(err, d) {
-        if (err) {
-          slack.post(url, data, done);
-          notificationsdb.insert({_id: payload, done:true});
-        } else {
-          done();
-        }
-      });
-      
+    var url = process.env.SLACK_WEBHOOK_URL;
+    notificationsdb.get(payload, function(err, d) {
+      if (err) {
+        slack.post(url, data, done);
+        notificationsdb.insert({_id: payload, done:true});
+      } else {
+        done();
+      }
     });
   });
 },1);
