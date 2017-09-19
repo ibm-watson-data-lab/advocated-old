@@ -1,0 +1,12 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.7.0
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:ms:20170412':
+    - cloudant-envoy > cloudant > debug > ms:
+        patched: '2017-05-23T07:11:05.666Z'
+    - cloudant-envoy > compression > debug > ms:
+        patched: '2017-05-23T07:11:05.666Z'
+    - cloudant-envoy > morgan > debug > ms:
+        patched: '2017-05-23T07:11:05.666Z'
