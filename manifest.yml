@@ -1,14 +1,14 @@
 declared-services:
-  advocated-cloudant:
+  Cloudant advocated:
     label: cloudantNoSQLDB
-    plan: Shared
+    plan: Standard
 applications:
 - path: .
-  memory: 256M
+  memory: 512M
   instances: 1
   domain: mybluemix.net
   name: advocated
-  host: advocated
+  host: advocated-cloudx
   disk_quota: 1024M
   services:
-  - advocated-cloudant
+  - Cloudant advocated
