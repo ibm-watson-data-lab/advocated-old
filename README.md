@@ -1,5 +1,7 @@
 # /advocated
 
+* This repostory holds the original version of Advocated. The one based on Envoy. The new serverless one has replaced this and is now the current versiojn *
+
 Advocated is a Developer Advocacy metrics collection application. It allows a Developer Advocate to record
 
 - the meetups/conferences they went to
