@@ -25,7 +25,7 @@
     "async": "^2.0.1",
     "body-parser": "^1.15.2",
     "cfenv": "^1.0.3",
-    "cloudant-envoy": "^0.2.2",
+    "cloudant-envoy": "^0.4.4",
     "crypto-js": "^3.1.6",
     "express": "^4.14.0",
     "request": "^2.74.0",
